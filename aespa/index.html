@@ -232,18 +232,30 @@
         box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
       }
       .member-visual {
-        height: 140px;
+        height: 300px;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
         overflow: hidden;
+        background: #111;
+      }
+      .member-photo {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 15%;
+        z-index: 0;
       }
       .member-visual::after {
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(to top, var(--card), transparent 60%);
+        background: linear-gradient(to top, var(--card) 0%, rgba(0, 0, 0, 0.15) 45%, transparent 70%);
+        z-index: 1;
+        pointer-events: none;
       }
       .member-initial {
         font-family: Syne, sans-serif;
@@ -252,6 +264,9 @@
         opacity: 0.35;
         position: relative;
         z-index: 1;
+      }
+      .member-visual.has-photo .member-initial {
+        display: none;
       }
       .member-symbol {
         position: absolute;
@@ -328,6 +343,15 @@
       .member.ningning .member-role {
         background: rgba(168, 85, 247, 0.2);
         color: #d8b4fe;
+      }
+      .member-photo-note {
+        margin-top: 14px;
+        font-size: 0.72rem;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .member-photo-note a {
+        color: #c4b5fd;
       }
 
       .timeline {
@@ -794,7 +818,14 @@
         </div>
         <div class="members">
           <article class="member karina">
-            <div class="member-visual">
+            <div class="member-visual has-photo">
+              <img
+                class="member-photo"
+                src="images/karina.jpg"
+                alt="KARINA 柳智敏"
+                loading="lazy"
+                decoding="async"
+              />
               <span class="member-symbol">💙</span>
               <span class="member-initial">K</span>
             </div>
@@ -816,7 +847,14 @@
           </article>
 
           <article class="member giselle">
-            <div class="member-visual">
+            <div class="member-visual has-photo">
+              <img
+                class="member-photo"
+                src="images/giselle.jpg"
+                alt="GISELLE 内永枝利"
+                loading="lazy"
+                decoding="async"
+              />
               <span class="member-symbol">🌙</span>
               <span class="member-initial">G</span>
             </div>
@@ -838,7 +876,14 @@
           </article>
 
           <article class="member winter">
-            <div class="member-visual">
+            <div class="member-visual has-photo">
+              <img
+                class="member-photo"
+                src="images/winter.jpg"
+                alt="WINTER 金旼炡"
+                loading="lazy"
+                decoding="async"
+              />
               <span class="member-symbol">⭐</span>
               <span class="member-initial">W</span>
             </div>
@@ -860,7 +905,14 @@
           </article>
 
           <article class="member ningning">
-            <div class="member-visual">
+            <div class="member-visual has-photo">
+              <img
+                class="member-photo"
+                src="images/ningning.jpg"
+                alt="NINGNING 宁艺卓"
+                loading="lazy"
+                decoding="async"
+              />
               <span class="member-symbol">🦋</span>
               <span class="member-initial">N</span>
             </div>
@@ -881,6 +933,11 @@
             </div>
           </article>
         </div>
+        <p class="member-photo-note">
+          成员照片已随页面打包（来源
+          <a href="https://commons.wikimedia.org/wiki/Category:Aespa" target="_blank" rel="noopener">Wikimedia Commons</a>
+          · CC BY 3.0），不依赖外网图床。
+        </p>
       </section>
 
       <section id="mv">
@@ -1183,6 +1240,15 @@
         <p style="margin-top: 8px">© aespa 及相关商标归 SM Entertainment 所有</p>
       </footer>
     </main>
+    <script>
+      document.querySelectorAll(".member-photo").forEach(function (img) {
+        img.addEventListener("error", function () {
+          img.remove();
+          var wrap = img.closest(".member-visual");
+          if (wrap) wrap.classList.remove("has-photo");
+        });
+      });
+    </script>
     <script>
       (function () {
         const frame = document.getElementById("mvFrame");
