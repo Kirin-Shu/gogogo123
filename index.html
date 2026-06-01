@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>小项目合集</title>
+    <style>
+      :root {
+        --bg: #0a0a0f;
+        --card: rgba(255, 255, 255, 0.05);
+        --border: rgba(255, 255, 255, 0.1);
+        --text: #f0f0f8;
+        --muted: #9ca3af;
+        --accent: #a855f7;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Segoe UI", "Noto Sans SC", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(ellipse 70% 50% at 10% 0%, rgba(168, 85, 247, 0.15), transparent),
+          radial-gradient(ellipse 50% 40% at 90% 10%, rgba(59, 130, 246, 0.12), transparent);
+        pointer-events: none;
+      }
+      main {
+        position: relative;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 48px 20px 64px;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 1.8rem;
+      }
+      .sub {
+        color: var(--muted);
+        margin: 0 0 32px;
+        font-size: 0.95rem;
+      }
+      .grid {
+        display: grid;
+        gap: 12px;
+      }
+      a.card {
+        display: block;
+        padding: 18px 20px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: inherit;
+        text-decoration: none;
+        transition: 0.2s;
+      }
+      a.card:hover {
+        border-color: rgba(168, 85, 247, 0.45);
+        transform: translateY(-1px);
+      }
+      a.card strong {
+        display: block;
+        font-size: 1.05rem;
+        margin-bottom: 4px;
+      }
+      a.card span {
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      footer {
+        margin-top: 40px;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>小项目合集</h1>
+      <p class="sub">静态页面，可直接在浏览器打开。部署后可通过公网链接分享给他人。</p>
+      <div class="grid">
+        <a class="card" href="aespa/index.html">
+          <strong>aespa 女团资料</strong>
+          <span>简介 · MV · 歌词 · 历程</span>
+        </a>
+        <a class="card" href="thunder-fighter/index.html">
+          <strong>雷霆战机</strong>
+          <span>纵版射击小游戏</span>
+        </a>
+        <a class="card" href="stock-analysis/index.html">
+          <strong>股票分析</strong>
+          <span>行情图表与数据</span>
+        </a>
+        <a class="card" href="snake-game/index.html">
+          <strong>贪吃蛇</strong>
+          <span>经典小游戏</span>
+        </a>
+        <a class="card" href="lol-kr-leaderboard/index.html">
+          <strong>LOL 韩服排行榜</strong>
+          <span>排行榜查询</span>
+        </a>
+      </div>
+      <footer>GitHub Pages 部署后，访问地址形如：https://你的用户名.github.io/仓库名/</footer>
+    </main>
+  </body>
+</html>

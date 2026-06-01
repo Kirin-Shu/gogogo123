@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>韩服 · 各位置英雄胜率榜</title>
+    <link rel="preconnect" href="https://ddragon.leagueoflegends.com" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-grid"></div>
+    <header class="hero">
+      <div class="hero__text">
+        <p class="eyebrow">League of Legends · KR ranked aggregate</p>
+        <h1>韩服各位置英雄胜率榜</h1>
+        <p class="lede">
+          英雄名称与头像来自 Riot <strong>Data Dragon</strong>（韩文 <code>champion.json</code>）。胜率 / 选取率 / 禁用率 / 对局量来自
+          <strong>OP.GG</strong> 排行榜接口（韩服 <code>kr</code>、单双 <code>RANKED_SOLO</code>、翡翠及以上
+          <code>EMERALD_PLUS</code>）。若直连被浏览器 CORS 拦截，会自动尝试公网 CORS 代理。
+        </p>
+      </div>
+      <div class="hero__panel">
+        <div class="stat-pill">
+          <span class="stat-pill__label">当前补丁</span>
+          <span id="patchLabel" class="stat-pill__value">加载中…</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-pill__label">数据来源</span>
+          <span id="dataSource" class="stat-pill__value">加载中…</span>
+        </div>
+      </div>
+    </header>
+
+    <nav class="lane-tabs" id="laneTabs" aria-label="分路选择"></nav>
+
+    <section class="toolbar">
+      <label class="search">
+        <span class="search__icon" aria-hidden="true">⌕</span>
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="按英雄名筛选（支持韩文 / 英文 key）"
+          autocomplete="off"
+        />
+      </label>
+      <div class="toolbar__meta">
+        <span id="rowCount" class="muted"></span>
+        <button type="button" id="resetSort" class="btn ghost">重置排序</button>
+      </div>
+    </section>
+
+    <div class="table-wrap">
+      <table class="board" id="board">
+        <thead>
+          <tr>
+            <th scope="col" class="col-rank">#</th>
+            <th scope="col" class="col-champ">英雄</th>
+            <th scope="col">
+              <button class="th-btn" data-sort="winRate">胜率</button>
+            </th>
+            <th scope="col">
+              <button class="th-btn" data-sort="pickRate">选取率</button>
+            </th>
+            <th scope="col">
+              <button class="th-btn" data-sort="banRate">禁用率</button>
+            </th>
+            <th scope="col">
+              <button class="th-btn" data-sort="games">对局量</button>
+            </th>
+            <th scope="col">
+              <button class="th-btn" data-sort="tierScore">强度分</button>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="boardBody"></tbody>
+      </table>
+    </div>
+
+    <footer class="footer">
+      <p>
+        榜单数值随 OP.GG 统计口径变化；若其接口路径或字段调整，页面可能需更新解析逻辑。公网 CORS 代理稳定性不保证，生产环境更推荐自建反代。
+      </p>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

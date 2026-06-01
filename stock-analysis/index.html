@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>股票分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+      :root {
+        --bg: #0d1117;
+        --card: #161b22;
+        --border: #30363d;
+        --text: #e6edf3;
+        --muted: #8b949e;
+        --up: #f85149;
+        --down: #3fb950;
+        --accent: #58a6ff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+        min-height: 100vh;
+      }
+      header {
+        padding: 20px 20px 12px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(180deg, #121820, var(--bg));
+      }
+      h1 {
+        margin: 0 0 6px;
+        font-size: 1.5rem;
+      }
+      .sub {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 18px;
+      }
+      label {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      input[type="text"] {
+        min-width: 160px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        font-size: 1rem;
+      }
+      select {
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+      }
+      button.primary {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        min-width: 104px;
+      }
+      button.primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .chip {
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        font-size: 0.8rem;
+        cursor: pointer;
+        color: var(--muted);
+      }
+      .chip:hover {
+        border-color: var(--accent);
+        color: var(--text);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px;
+      }
+      .card .k {
+        font-size: 0.75rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .card .v {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-top: 4px;
+        font-variant-numeric: tabular-nums;
+      }
+      .card .v.up {
+        color: var(--up);
+      }
+      .card .v.down {
+        color: var(--down);
+      }
+      .chart-wrap {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+        position: relative;
+        height: 380px;
+      }
+      .chart-wrap.loading::after {
+        content: "图表加载中…";
+        position: absolute;
+        inset: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(13, 17, 23, 0.55);
+        border-radius: 8px;
+        color: var(--muted);
+        font-size: 0.9rem;
+        pointer-events: none;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      th,
+      td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        color: var(--muted);
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      .err {
+        padding: 14px;
+        border-radius: 8px;
+        background: rgba(248, 81, 73, 0.12);
+        border: 1px solid rgba(248, 81, 73, 0.35);
+        color: #ffa198;
+        margin-bottom: 16px;
+        display: none;
+      }
+      .err.show {
+        display: block;
+      }
+      footer {
+        padding: 24px 20px;
+        color: var(--muted);
+        font-size: 0.8rem;
+        text-align: center;
+        border-top: 1px solid var(--border);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>股票分析</h1>
+      <p class="sub">行情来自 Yahoo Finance（经网络拉取；直连失败时会走公共 CORS 代理）。A 股示例需带交易所后缀，如 <code>600519.SS</code>、<code>000001.SZ</code>。若双击文件无法拉取数据，请用 <code>python -m http.server</code> 在本目录启动后访问 <code>http://127.0.0.1:端口/</code>。仅供学习参考，不构成投资建议。</p>
+    </header>
+    <main>
+      <div class="err" id="err"></div>
+      <div class="toolbar">
+        <div>
+          <label for="sym">代码</label><br />
+          <input id="sym" type="text" placeholder="AAPL 或 600519.SS" value="AAPL" autocomplete="off" />
+        </div>
+        <div>
+          <label for="range">区间</label><br />
+          <select id="range">
+            <option value="1mo">1 个月</option>
+            <option value="3mo" selected>3 个月</option>
+            <option value="6mo">6 个月</option>
+            <option value="1y">1 年</option>
+          </select>
+        </div>
+        <div style="align-self: flex-end">
+          <button class="primary" id="go" type="button">分析</button>
+        </div>
+      </div>
+      <p class="sub" style="margin: -8px 0 14px">快捷：</p>
+      <div class="chips" id="chips"></div>
+
+      <h2 class="sub" style="margin: 22px 0 12px; font-size: 1rem; color: var(--text)">概览</h2>
+      <div class="grid" id="cards"></div>
+
+      <h2 class="sub" style="margin: 8px 0 12px; font-size: 1rem; color: var(--text)">价格与成交量</h2>
+      <div class="chart-wrap" id="chartWrap"><canvas id="chart" aria-label="收盘价与成交量"></canvas></div>
+
+      <h2 class="sub" style="margin: 8px 0 12px; font-size: 1rem; color: var(--text)">简易指标</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>指标</th>
+            <th>数值</th>
+            <th>说明</th>
+          </tr>
+        </thead>
+        <tbody id="metrics"></tbody>
+      </table>
+    </main>
+    <footer>数据延迟与缺失以 Yahoo 为准；公共代理可能不稳定，生产环境请自建后端转发。</footer>
+
+    <script>
+      (function () {
+        const chips = ["AAPL", "MSFT", "GOOGL", "TSLA", "600519.SS", "000001.SZ"];
+        const symEl = document.getElementById("sym");
+        const rangeEl = document.getElementById("range");
+        const goBtn = document.getElementById("go");
+        const errEl = document.getElementById("err");
+        const cardsEl = document.getElementById("cards");
+        const metricsEl = document.getElementById("metrics");
+        const chipBox = document.getElementById("chips");
+        const chartWrap = document.getElementById("chartWrap");
+
+        const LS_KEY = "stock-analysis:v1";
+        let chart;
+        let loadSeq = 0;
+        let abortCtl = null;
+        const goDefaultLabel = "分析";
+
+        chips.forEach((c) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "chip";
+          b.textContent = c;
+          b.addEventListener("click", () => {
+            symEl.value = c;
+            load();
+          });
+          chipBox.appendChild(b);
+        });
+
+        function loadPrefs() {
+          try {
+            const j = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
+            if (j.sym && typeof j.sym === "string") symEl.value = j.sym;
+            if (j.range && rangeEl.querySelector(`option[value="${j.range}"]`)) rangeEl.value = j.range;
+          } catch (_) {}
+        }
+
+        function savePrefs(sym, range) {
+          try {
+            localStorage.setItem(LS_KEY, JSON.stringify({ sym, range }));
+          } catch (_) {}
+        }
+
+        function setLoading(on) {
+          chartWrap.classList.toggle("loading", on);
+          goBtn.textContent = on ? "分析中…" : goDefaultLabel;
+          goBtn.setAttribute("aria-busy", on ? "true" : "false");
+        }
+
+        function intervalForRange(range) {
+          if (range === "1y") return "1d";
+          if (range === "6mo") return "1d";
+          return "1d";
+        }
+
+        function yahooChartError(json) {
+          const e = json && json.chart && json.chart.error;
+          if (!e) return null;
+          if (typeof e === "string") return e;
+          return e.description || e.code || "Yahoo 返回错误";
+        }
+
+        function showErr(msg) {
+          errEl.textContent = msg;
+          errEl.classList.toggle("show", !!msg);
+        }
+
+        function yahooUrlMirror(url) {
+          if (url.includes("query1.finance.yahoo.com")) {
+            return url.replace("query1.finance.yahoo.com", "query2.finance.yahoo.com");
+          }
+          return null;
+        }
+
+        function parseJsonBody(text, label) {
+          try {
+            return JSON.parse(text);
+          } catch (_) {
+            throw new Error(label + "：JSON 解析失败（可能被返回了 HTML 或空页）");
+          }
+        }
+
+        async function fetchJsonAny(url, signal) {
+          const targets = [url];
+          const m = yahooUrlMirror(url);
+          if (m && m !== url) targets.push(m);
+
+          const attempts = [];
+          for (const target of targets) {
+            attempts.push(
+              ["allorigins(raw)", "https://api.allorigins.win/raw?url=" + encodeURIComponent(target)],
+              ["allorigins(get)", "https://api.allorigins.win/get?url=" + encodeURIComponent(target)],
+              ["corsproxy.io", "https://corsproxy.io/?" + encodeURIComponent(target)],
+              ["codetabs", "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(target)],
+              ["直连 Yahoo", target]
+            );
+          }
+
+          let last = null;
+          for (const [name, u] of attempts) {
+            if (signal.aborted) throw new DOMException("Aborted", "AbortError");
+            try {
+              if (name === "allorigins(get)") {
+                const r = await fetch(u, { cache: "no-store", signal });
+                if (!r.ok) {
+                  last = new Error(name + "：" + r.status + " " + r.statusText);
+                  continue;
+                }
+                const outer = await r.json();
+                const c = outer && outer.contents;
+                if (c == null) {
+                  last = new Error(name + "：返回无 contents");
+                  continue;
+                }
+                const text = typeof c === "string" ? c : JSON.stringify(c);
+                last = null;
+                return parseJsonBody(text, name);
+              }
+
+              const r = await fetch(u, { cache: "no-store", signal, redirect: "follow" });
+              if (!r.ok) {
+                last = new Error(name + "：" + r.status + " " + r.statusText);
+                continue;
+              }
+              const t = await r.text();
+              last = null;
+              return parseJsonBody(t, name);
+            } catch (e) {
+              if (e.name === "AbortError") throw e;
+              last = e;
+            }
+          }
+
+          const hint =
+            "（直连 Yahoo 在浏览器里通常会被跨域拦截；若全部代理失败，请用 http://localhost 打开页面而非 file://，并暂时关闭广告拦截；部分地区访问 Yahoo 需稳定出境网络。）";
+          if (last && String(last.message || "").includes("Failed to fetch")) {
+            throw new Error("无法连接数据接口（Failed to fetch）" + hint);
+          }
+          throw last || new Error("网络请求失败" + hint);
+        }
+
+        function normalizeSymbol(s) {
+          return String(s || "")
+            .trim()
+            .replace(/\s+/g, "")
+            .toUpperCase();
+        }
+
+        function zipSeries(ts, quote) {
+          const n = ts.length;
+          const out = [];
+          for (let i = 0; i < n; i++) {
+            const c = quote.close[i];
+            const o = quote.open[i];
+            const h = quote.high[i];
+            const l = quote.low[i];
+            const v = quote.volume[i];
+            if (c == null || !Number.isFinite(c)) continue;
+            out.push({
+              t: ts[i] * 1000,
+              o: o,
+              h: h,
+              l: l,
+              c: c,
+              v: v && Number.isFinite(v) ? v : 0,
+            });
+          }
+          return out;
+        }
+
+        function sma(arr, period) {
+          const r = [];
+          for (let i = 0; i < arr.length; i++) {
+            if (i + 1 < period) {
+              r.push(null);
+              continue;
+            }
+            let s = 0;
+            for (let j = 0; j < period; j++) s += arr[i - j];
+            r.push(s / period);
+          }
+          return r;
+        }
+
+        function rsi(closes, period) {
+          if (closes.length < period + 1) return closes.map(() => null);
+          const out = closes.map(() => null);
+          let gains = 0;
+          let losses = 0;
+          for (let i = 1; i <= period; i++) {
+            const ch = closes[i] - closes[i - 1];
+            if (ch >= 0) gains += ch;
+            else losses -= ch;
+          }
+          let avgG = gains / period;
+          let avgL = losses / period;
+          const rs = avgL === 0 ? 100 : avgG / avgL;
+          out[period] = 100 - 100 / (1 + rs);
+          for (let i = period + 1; i < closes.length; i++) {
+            const ch = closes[i] - closes[i - 1];
+            const g = ch > 0 ? ch : 0;
+            const l = ch < 0 ? -ch : 0;
+            avgG = (avgG * (period - 1) + g) / period;
+            avgL = (avgL * (period - 1) + l) / period;
+            const rs2 = avgL === 0 ? 100 : avgG / avgL;
+            out[i] = 100 - 100 / (1 + rs2);
+          }
+          return out;
+        }
+
+        function stdev(arr) {
+          const m = arr.reduce((a, b) => a + b, 0) / arr.length;
+          const v = arr.reduce((s, x) => s + (x - m) * (x - m), 0) / (arr.length - 1);
+          return Math.sqrt(v);
+        }
+
+        function fmt(n, d) {
+          if (n == null || !Number.isFinite(n)) return "—";
+          return n.toLocaleString("zh-CN", { maximumFractionDigits: d });
+        }
+
+        function pct(n) {
+          if (n == null || !Number.isFinite(n)) return "—";
+          const s = (n * 100).toFixed(2) + "%";
+          return n >= 0 ? "+" + s : s;
+        }
+
+        function setCards(meta, series, prevClose) {
+          const last = series[series.length - 1];
+          const px =
+            meta.regularMarketPrice != null && Number.isFinite(meta.regularMarketPrice)
+              ? meta.regularMarketPrice
+              : last.c;
+          const chgDay =
+            prevClose && Number.isFinite(prevClose) ? (px - prevClose) / prevClose : null;
+          const chgRange =
+            series.length > 1 && Number.isFinite(series[0].c)
+              ? (last.c - series[0].c) / series[0].c
+              : null;
+          const cls = chgDay != null ? (chgDay >= 0 ? "up" : "down") : "";
+          const signD = chgDay != null && chgDay >= 0 ? "+" : "";
+          const signR = chgRange != null && chgRange >= 0 ? "+" : "";
+          const clsR = chgRange != null ? (chgRange >= 0 ? "up" : "down") : "";
+
+          const items = [
+            ["名称", meta.longName || meta.shortName || meta.symbol, ""],
+            ["代码", meta.symbol, ""],
+            ["最新价", fmt(px, 2), ""],
+            ["相对前收", chgDay != null ? signD + (chgDay * 100).toFixed(2) + "%" : "—", cls],
+            ["区间涨跌", chgRange != null ? signR + (chgRange * 100).toFixed(2) + "%" : "—", clsR],
+            ["货币", meta.currency || "—", ""],
+            ["52 周高", meta.fiftyTwoWeekHigh != null ? fmt(meta.fiftyTwoWeekHigh, 2) : "—", ""],
+            ["52 周低", meta.fiftyTwoWeekLow != null ? fmt(meta.fiftyTwoWeekLow, 2) : "—", ""],
+            ["当日高", meta.regularMarketDayHigh != null ? fmt(meta.regularMarketDayHigh, 2) : "—", ""],
+            ["当日低", meta.regularMarketDayLow != null ? fmt(meta.regularMarketDayLow, 2) : "—", ""],
+            ["成交量", meta.regularMarketVolume != null ? fmt(meta.regularMarketVolume, 0) : "—", ""],
+          ];
+          cardsEl.innerHTML = items
+            .map(
+              ([k, v, c]) =>
+                `<div class="card"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`,
+            )
+            .join("");
+        }
+
+        function setMetrics(series) {
+          const closes = series.map((x) => x.c);
+          const s5 = sma(closes, 5);
+          const s20 = sma(closes, 20);
+          const r = rsi(closes, 14);
+          const rets = [];
+          for (let i = 1; i < closes.length; i++) rets.push(Math.log(closes[i] / closes[i - 1]));
+          const vol = rets.length > 2 ? stdev(rets) : null;
+          const ann = vol != null ? vol * Math.sqrt(252) : null;
+          const lastRsi = [...r].reverse().find((x) => x != null);
+          const lastS5 = [...s5].reverse().find((x) => x != null);
+          const lastS20 = [...s20].reverse().find((x) => x != null);
+
+          const rows = [
+            ["SMA5", lastS5 != null ? fmt(lastS5, 2) : "—", "最近 5 个交易日收盘均价"],
+            ["SMA20", lastS20 != null ? fmt(lastS20, 2) : "—", "最近 20 个交易日收盘均价"],
+            ["RSI(14)", lastRsi != null ? fmt(lastRsi, 1) : "—", "相对强弱，>70 偏热、<30 偏冷（简化 Wilder）"],
+            ["日收益波动率（样本）", vol != null ? fmt(vol * 100, 3) + "%" : "—", "对数日收益标准差"],
+            ["年化波动（粗估）", ann != null ? fmt(ann * 100, 1) + "%" : "—", "σ_daily × √252，仅供参考"],
+            ["首尾涨跌", closes.length > 1 ? pct(closes[closes.length - 1] / closes[0] - 1) : "—", "区间内第一根与最后一根收盘价"],
+          ];
+          metricsEl.innerHTML = rows
+            .map(([a, b, c]) => `<tr><td>${a}</td><td>${b}</td><td style="color:var(--muted)">${c}</td></tr>`)
+            .join("");
+        }
+
+        function drawChart(series) {
+          const labels = series.map((x) => {
+            const d = new Date(x.t);
+            return d.toLocaleDateString("zh-CN", { month: "numeric", day: "numeric" });
+          });
+          const prices = series.map((x) => x.c);
+          const vols = series.map((x) => x.v);
+
+          if (chart) chart.destroy();
+          const ctx = document.getElementById("chart").getContext("2d");
+          chart = new Chart(ctx, {
+            data: {
+              labels,
+              datasets: [
+                {
+                  type: "line",
+                  label: "收盘",
+                  data: prices,
+                  borderColor: "#58a6ff",
+                  backgroundColor: "rgba(88,166,255,0.08)",
+                  fill: true,
+                  tension: 0.15,
+                  yAxisID: "y",
+                  pointRadius: 0,
+                  borderWidth: 2,
+                },
+                {
+                  type: "bar",
+                  label: "成交量",
+                  data: vols,
+                  backgroundColor: "rgba(139,148,158,0.35)",
+                  yAxisID: "y1",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: { mode: "index", intersect: false },
+              plugins: {
+                legend: { labels: { color: "#8b949e" } },
+                tooltip: {
+                  callbacks: {
+                    title(items) {
+                      const i = items[0].dataIndex;
+                      const t = series[i] && series[i].t;
+                      if (!t) return "";
+                      return new Date(t).toLocaleString("zh-CN", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      });
+                    },
+                    label(ctx) {
+                      const v = ctx.parsed.y;
+                      if (ctx.dataset.label === "成交量") return "成交量: " + fmt(v, 0);
+                      return "收盘: " + fmt(v, 2);
+                    },
+                  },
+                },
+              },
+              scales: {
+                x: {
+                  ticks: { color: "#8b949e", maxTicksLimit: 8 },
+                  grid: { color: "rgba(48,54,61,0.6)" },
+                },
+                y: {
+                  position: "left",
+                  ticks: { color: "#8b949e" },
+                  grid: { color: "rgba(48,54,61,0.6)" },
+                },
+                y1: {
+                  position: "right",
+                  ticks: { color: "#6e7681", callback: (v) => (v >= 1e9 ? v / 1e9 + "B" : v >= 1e6 ? v / 1e6 + "M" : v / 1e3 + "K") },
+                  grid: { drawOnChartArea: false },
+                },
+              },
+            },
+          });
+        }
+
+        async function load() {
+          showErr("");
+          symEl.removeAttribute("aria-invalid");
+          const sym = normalizeSymbol(symEl.value);
+          if (!sym) {
+            showErr("请输入股票代码。");
+            symEl.setAttribute("aria-invalid", "true");
+            return;
+          }
+          const mySeq = ++loadSeq;
+          if (abortCtl) abortCtl.abort();
+          abortCtl = new AbortController();
+          const signal = abortCtl.signal;
+          goBtn.disabled = true;
+          setLoading(true);
+          try {
+            const range = rangeEl.value;
+            const interval = intervalForRange(range);
+            const url =
+              "https://query1.finance.yahoo.com/v8/finance/chart/" +
+              encodeURIComponent(sym) +
+              "?range=" +
+              range +
+              "&interval=" +
+              interval;
+            const json = await fetchJsonAny(url, signal);
+            if (mySeq !== loadSeq) return;
+            const yErr = yahooChartError(json);
+            if (yErr) throw new Error(yErr);
+            const res = json.chart.result && json.chart.result[0];
+            if (!res) throw new Error("无数据（代码是否正确？）");
+
+            const meta = res.meta;
+            const ts = res.timestamp;
+            const quote = res.indicators.quote[0];
+            const series = zipSeries(ts, quote);
+            if (series.length < 2) throw new Error("有效 K 线过少，请换区间或代码。");
+
+            const prevClose = meta.chartPreviousClose ?? meta.previousClose;
+            setCards(meta, series, prevClose);
+            setMetrics(series);
+            drawChart(series);
+            savePrefs(sym, range);
+          } catch (e) {
+            if (e.name === "AbortError") return;
+            console.error(e);
+            showErr("加载失败：" + (e.message || String(e)) + "。可换网络、换代码或稍后重试。");
+            symEl.setAttribute("aria-invalid", "true");
+            cardsEl.innerHTML = "";
+            metricsEl.innerHTML = "";
+            if (chart) {
+              chart.destroy();
+              chart = null;
+            }
+          } finally {
+            if (mySeq === loadSeq) {
+              goBtn.disabled = false;
+              setLoading(false);
+            }
+          }
+        }
+
+        goBtn.addEventListener("click", load);
+        rangeEl.addEventListener("change", () => {
+          if (normalizeSymbol(symEl.value)) load();
+        });
+        symEl.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") load();
+        });
+
+        loadPrefs();
+        load();
+      })();
+    </script>
+  </body>
+</html>
