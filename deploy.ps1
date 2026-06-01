@@ -7,7 +7,8 @@ $ErrorActionPreference = "Stop"
 $git = "C:\Program Files\Git\cmd\git.exe"
 $repoRoot = $PSScriptRoot
 $repoName = "gogogo123"
-$githubUser = "shuxianglin1126"
+# 若用户名不是 Kirin-Shu，请先设置：$env:GITHUB_USER = "你的GitHub用户名"
+$githubUser = if ($env:GITHUB_USER) { $env:GITHUB_USER } else { "Kirin-Shu" }
 
 if (-not (Test-Path $git)) {
     Write-Host "未找到 Git，请先安装 Git for Windows。" -ForegroundColor Red
@@ -59,6 +60,25 @@ if ($remotes -notcontains "origin") {
 }
 
 & $git push -u origin main --force
+
+# 尝试开启 GitHub Pages（main 分支 / root）
+try {
+    $headers = @{
+        Authorization = "Bearer $($env:GH_TOKEN)"
+        Accept        = "application/vnd.github+json"
+        "X-GitHub-Api-Version" = "2022-11-28"
+    }
+    $pagesBody = @{
+        source = @{
+            branch = "main"
+            path   = "/"
+        }
+    } | ConvertTo-Json -Depth 3
+    Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/$repoName/pages" -Method Post -Headers $headers -Body $pagesBody -ContentType "application/json" | Out-Null
+    Write-Host "已开启 GitHub Pages" -ForegroundColor Green
+} catch {
+    Write-Host "Pages 需在网页手动开启一次：Settings → Pages → main / (root)" -ForegroundColor Yellow
+}
 
 Write-Host ""
 Write-Host "部署完成！约 1～2 分钟后访问：" -ForegroundColor Green
