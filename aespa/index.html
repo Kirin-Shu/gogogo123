@@ -336,14 +336,35 @@
         position: sticky;
         top: 0;
         z-index: 100;
+        background: rgba(5, 5, 8, 0.82);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-inner {
         display: flex;
         justify-content: center;
         gap: 6px;
         flex-wrap: wrap;
         padding: 12px 16px;
-        background: rgba(5, 5, 8, 0.82);
-        backdrop-filter: blur(12px);
-        border-bottom: 1px solid var(--border);
+        max-width: 960px;
+        margin: 0 auto;
+      }
+      @media (max-width: 720px) {
+        .nav-inner {
+          flex-wrap: nowrap;
+          justify-content: flex-start;
+          overflow-x: auto;
+          scroll-behavior: smooth;
+          scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
+          padding: 10px 14px;
+        }
+        .nav-inner::-webkit-scrollbar {
+          display: none;
+        }
+        .nav a {
+          flex-shrink: 0;
+        }
       }
       .nav a {
         color: var(--muted);
@@ -867,12 +888,142 @@
         text-decoration: none;
       }
 
+      .comeback-showcase {
+        display: grid;
+        grid-template-columns: minmax(140px, 200px) 1fr;
+        gap: 20px;
+        align-items: stretch;
+        margin-bottom: 16px;
+      }
+      .comeback-cover {
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(250, 204, 21, 0.3);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+        min-height: 200px;
+      }
+      .comeback-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .comeback-cover-glow {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(5, 5, 8, 0.55) 0%, transparent 50%);
+        pointer-events: none;
+      }
+      .comeback-cover-label {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        font-size: 0.65rem;
+        letter-spacing: 0.08em;
+        color: rgba(255, 255, 255, 0.75);
+      }
+      .comeback-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .comeback-stat {
+        text-align: center;
+        padding: 12px 10px;
+        border-radius: 12px;
+        background: var(--card);
+        border: 1px solid var(--border);
+      }
+      .comeback-stat b {
+        display: block;
+        font-family: Syne, sans-serif;
+        font-size: 1.1rem;
+        color: #fde047;
+        margin-bottom: 2px;
+      }
+      .comeback-stat span {
+        font-size: 0.68rem;
+        color: var(--muted);
+      }
+      .comeback-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .comeback-btn {
+        font-size: 0.78rem;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(250, 204, 21, 0.35);
+        background: rgba(250, 204, 21, 0.1);
+        color: #fef08a;
+        cursor: pointer;
+        font-family: inherit;
+        text-decoration: none;
+        transition: background 0.2s, border-color 0.2s;
+      }
+      .comeback-btn:hover {
+        background: rgba(250, 204, 21, 0.2);
+        border-color: rgba(250, 204, 21, 0.55);
+      }
+      .comeback-btn.secondary {
+        border-color: rgba(168, 85, 247, 0.35);
+        background: rgba(168, 85, 247, 0.1);
+        color: #d8b4fe;
+      }
+      .comeback-btn.secondary:hover {
+        background: rgba(168, 85, 247, 0.22);
+      }
+      @media (max-width: 640px) {
+        .comeback-showcase {
+          grid-template-columns: 1fr;
+        }
+        .comeback-cover {
+          max-height: 220px;
+        }
+        .comeback-stats {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .back-to-top {
+        position: fixed;
+        right: 20px;
+        bottom: 24px;
+        z-index: 200;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 1px solid rgba(168, 85, 247, 0.45);
+        background: rgba(14, 14, 22, 0.92);
+        color: #e9d5ff;
+        font-size: 1.2rem;
+        cursor: pointer;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(12px);
+        transition: opacity 0.25s, transform 0.25s, visibility 0.25s, background 0.2s;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      }
+      .back-to-top.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+      .back-to-top:hover {
+        background: rgba(168, 85, 247, 0.35);
+      }
+
       .comeback-banner {
         background: linear-gradient(135deg, rgba(250, 204, 21, 0.12), rgba(236, 72, 153, 0.1));
         border: 1px solid rgba(250, 204, 21, 0.25);
         border-radius: 18px;
         padding: 24px;
-        margin-bottom: 16px;
+        margin-bottom: 0;
       }
       .comeback-banner .new-badge {
         display: inline-block;
@@ -1137,15 +1288,17 @@
       <span class="orb orb-4"></span>
     </div>
     <nav class="nav" id="mainNav">
-      <a href="#about" data-nav="about">简介</a>
-      <a href="#latest" data-nav="latest">最新</a>
-      <a href="#concept" data-nav="concept">世界观</a>
-      <a href="#members" data-nav="members">成员</a>
-      <a href="#mv" data-nav="mv">MV</a>
-      <a href="#lyrics" data-nav="lyrics">歌词</a>
-      <a href="#timeline" data-nav="timeline">历程</a>
-      <a href="#music" data-nav="music">作品</a>
-      <a href="#awards" data-nav="awards">荣誉</a>
+      <div class="nav-inner">
+        <a href="#about" data-nav="about">简介</a>
+        <a href="#latest" data-nav="latest">最新</a>
+        <a href="#concept" data-nav="concept">世界观</a>
+        <a href="#members" data-nav="members">成员</a>
+        <a href="#mv" data-nav="mv">MV</a>
+        <a href="#lyrics" data-nav="lyrics">歌词</a>
+        <a href="#timeline" data-nav="timeline">历程</a>
+        <a href="#music" data-nav="music">作品</a>
+        <a href="#awards" data-nav="awards">荣誉</a>
+      </div>
     </nav>
 
     <main>
@@ -1213,25 +1366,43 @@
           <h2>最新回归</h2>
           <span>LATEST · 2026</span>
         </div>
-        <div class="comeback-banner">
-          <span class="new-badge">NEW ALBUM</span>
-          <h3>LEMONADE</h3>
-          <p>
-            2026 年 5 月 29 日发行第二张正规专辑《LEMONADE》，距首张正规《Armageddon》约两年。先行曲
-            <strong>WDA (Whole Different Animal)</strong> 与 G-DRAGON 合作，主打曲以 EDM 与合成器 Bass 呈现夏日清爽风格，歌词借「若生活给你柠檬，就做柠檬水」传递把逆境化为机遇的态度，KWANGYA 世界观再进一步扩展。
-          </p>
-          <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 0">
-            后续巡演 <strong>SYNK: COMPLæXITY</strong>（2026.08 起）将横跨亚洲、美洲与欧洲。MV 发布 24 小时内播放量破千万，专辑登顶多国 iTunes 专辑榜。
-          </p>
-          <div class="track-pills">
-            <span class="track-pill">Lemonade</span>
-            <span class="track-pill feat">WDA (Feat. G-DRAGON)</span>
-            <span class="track-pill">Shakin'</span>
-            <span class="track-pill">Can't Help Myself</span>
-            <span class="track-pill">Camouflage</span>
-            <span class="track-pill feat">Switchblade (Feat. Ty Dolla $ign)</span>
-            <span class="track-pill feat">Lemonade (Feat. Becky G)</span>
+        <div class="comeback-showcase">
+          <div class="comeback-cover">
+            <img src="images/lemonade-cover.jpg" alt="LEMONADE 专辑封面" loading="lazy" decoding="async" />
+            <div class="comeback-cover-glow"></div>
+            <span class="comeback-cover-label">THE 2ND ALBUM · 2026.05.29</span>
           </div>
+          <div class="comeback-banner">
+            <span class="new-badge">NEW ALBUM</span>
+            <h3>LEMONADE</h3>
+            <p>
+              2026 年 5 月 29 日发行第二张正规专辑《LEMONADE》，距首张正规《Armageddon》约两年。先行曲
+              <strong>WDA (Whole Different Animal)</strong> 与 G-DRAGON 合作，主打曲以 EDM 与合成器 Bass 呈现夏日清爽风格，歌词借「若生活给你柠檬，就做柠檬水」传递把逆境化为机遇的态度。
+            </p>
+            <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 0">
+              后续巡演 <strong>SYNK: COMPLæXITY</strong>（2026.08 起）将横跨亚洲、美洲与欧洲。
+            </p>
+            <div class="track-pills">
+              <span class="track-pill">Lemonade</span>
+              <span class="track-pill feat">WDA (Feat. G-DRAGON)</span>
+              <span class="track-pill">Shakin'</span>
+              <span class="track-pill">Can't Help Myself</span>
+              <span class="track-pill">Camouflage</span>
+              <span class="track-pill feat">Switchblade (Feat. Ty Dolla $ign)</span>
+              <span class="track-pill feat">Lemonade (Feat. Becky G)</span>
+            </div>
+          </div>
+        </div>
+        <div class="comeback-stats">
+          <div class="comeback-stat"><b>24h</b><span>MV 破千万播放</span></div>
+          <div class="comeback-stat"><b>#1</b><span>多国 iTunes 专辑榜</span></div>
+          <div class="comeback-stat"><b>7</b><span>首全曲收录</span></div>
+        </div>
+        <div class="comeback-actions">
+          <button type="button" class="comeback-btn" data-song="lemonade">▶ 播放 LEMONADE MV</button>
+          <button type="button" class="comeback-btn secondary" data-song="wda">▶ 播放 WDA MV</button>
+          <a class="comeback-btn secondary" href="#lyric-lemonade">📖 歌词解读</a>
+          <a class="comeback-btn secondary" href="https://aespa.lnk.to/LEMONADE" target="_blank" rel="noopener">🎧 试听专辑</a>
         </div>
         <div class="info-grid">
           <div class="info-item">
@@ -1358,7 +1529,7 @@
                 <div class="member-gallery-track">
                   <img class="member-photo" src="images/winter.jpg" alt="WINTER 金旼炡 · Love Your W" loading="lazy" decoding="async" />
                   <img class="member-photo" src="images/winter-2.jpg" alt="WINTER 金旼炡 · 活动照" loading="lazy" decoding="async" />
-                  <img class="member-photo" src="images/winter-2.jpg" alt="WINTER 金旼炡 · 特写" loading="lazy" decoding="async" style="object-position: center 72%" />
+                  <img class="member-photo" src="images/winter-3.jpg" alt="WINTER 金旼炡 · 演唱会" loading="lazy" decoding="async" />
                 </div>
                 <div class="member-gallery-ui">
                   <span class="member-gallery-hint">滑动 · 3 张</span>
@@ -1461,6 +1632,7 @@
         <div class="mv-tabs" id="mvTabs">
           <button type="button" class="mv-tab active" data-song="lemonade" data-id="83C3TZ4Zm_o" data-bvid="BV1fqVb62E3G" data-aid="116655875167693" data-cid="38689572445" data-title="LEMONADE" data-meta="2026 · 正规二辑主打">LEMONADE</button>
           <button type="button" class="mv-tab" data-song="wda" data-id="iTJSbJtS8MU" data-bvid="BV15y5W6hEHo" data-aid="116554507231082" data-cid="38253495755" data-title="WDA" data-meta="2026 · Feat. G-DRAGON">WDA</button>
+          <button type="button" class="mv-tab" data-song="rich-man" data-id="5oQVTnq-UKk" data-bvid="BV17FaUz8EVC" data-aid="115145321814259" data-cid="32169003624" data-title="Rich Man" data-meta="2025 · 迷你六辑主打">Rich Man</button>
           <button type="button" class="mv-tab" data-song="whiplash" data-id="jWQx2f-CErU" data-bvid="BV16yyVYxEUt" data-aid="113344606379630" data-cid="26394560748" data-title="Whiplash" data-meta="2024 · 迷你五辑">Whiplash</button>
           <button type="button" class="mv-tab" data-song="supernova" data-id="phuiiNCxRMg" data-bvid="BV19m421T7xS" data-aid="1604625177" data-cid="1543605902" data-title="Supernova" data-meta="2024 · 正规一辑先行">Supernova</button>
           <button type="button" class="mv-tab" data-song="armageddon" data-id="nFYwcndNuOY" data-bvid="BV12i421S7iH" data-aid="1455127164" data-cid="1561564174" data-title="Armageddon" data-meta="2024 · 正规一辑主打">Armageddon</button>
@@ -1564,6 +1736,18 @@
             <p class="lyric-note">出道曲 · KWANGYA 概念首次亮相</p>
             <div class="lyric-actions">
               <button type="button" class="lyric-mv-link" data-song="black-mamba">▶ 播放 MV</button>
+            </div>
+          </article>
+          <article class="lyric-card" id="lyric-rich-man" data-song="rich-man">
+            <h3>Rich Man</h3>
+            <p class="album-ref">迷你六辑《Rich Man》· 2025</p>
+            <p class="lyric-ko">「I am enough as I am · I am a Rich Man」</p>
+            <p class="lyric-zh">
+              以电吉他驱动的自信宣言——「我就是 Rich Man」，强调精神与物质上的独立自足，不被外界标准定义，是 aespa 2025 年迷你六辑的核心态度。
+            </p>
+            <p class="lyric-note">2025.09 发行 · 6 首收录 · 吉他 Rock 风格</p>
+            <div class="lyric-actions">
+              <button type="button" class="lyric-mv-link" data-song="rich-man">▶ 播放 MV</button>
             </div>
           </article>
           <article class="lyric-card" id="lyric-wda" data-song="wda">
@@ -1774,6 +1958,7 @@
         <p style="margin-top: 8px">© aespa 及相关商标归 SM Entertainment 所有</p>
       </footer>
     </main>
+    <button type="button" class="back-to-top" id="backToTop" aria-label="回到顶部">↑</button>
     <script>
       (function () {
         var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1872,15 +2057,26 @@
     <script>
       (function () {
         var navLinks = document.querySelectorAll("#mainNav a[data-nav]");
+        var navInner = document.querySelector(".nav-inner");
         var sections = document.querySelectorAll("main section[id]");
         if (!navLinks.length || !sections.length) return;
+
+        function centerNavLink(link) {
+          if (!navInner || !link || window.innerWidth > 720) return;
+          var left = link.offsetLeft - navInner.clientWidth / 2 + link.clientWidth / 2;
+          navInner.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+        }
 
         function setActiveNav(id) {
           navLinks.forEach(function (link) {
             var active = link.dataset.nav === id;
             link.classList.toggle("active", active);
-            if (active) link.setAttribute("aria-current", "true");
-            else link.removeAttribute("aria-current");
+            if (active) {
+              link.setAttribute("aria-current", "true");
+              centerNavLink(link);
+            } else {
+              link.removeAttribute("aria-current");
+            }
           });
         }
 
@@ -1903,6 +2099,31 @@
         } else {
           setActiveNav(sections[0].id);
         }
+      })();
+    </script>
+    <script>
+      (function () {
+        var btn = document.getElementById("backToTop");
+        if (!btn) return;
+        window.addEventListener(
+          "scroll",
+          function () {
+            btn.classList.toggle("visible", window.scrollY > 400);
+          },
+          { passive: true }
+        );
+        btn.addEventListener("click", function () {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      })();
+    </script>
+    <script>
+      (function () {
+        document.querySelectorAll(".comeback-btn[data-song]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            if (window.aespaSelectMv) window.aespaSelectMv(btn.dataset.song, false);
+          });
+        });
       })();
     </script>
     <script>
