@@ -53,7 +53,9 @@
         gap: 12px;
       }
       a.card {
-        display: block;
+        display: flex;
+        gap: 16px;
+        align-items: center;
         padding: 18px 20px;
         border-radius: 14px;
         border: 1px solid var(--border);
@@ -61,6 +63,17 @@
         color: inherit;
         text-decoration: none;
         transition: 0.2s;
+      }
+      a.card .card-thumb {
+        flex: 0 0 72px;
+        width: 72px;
+        height: 72px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 1px solid var(--border);
+      }
+      a.card .card-body {
+        min-width: 0;
       }
       a.card:hover {
         border-color: rgba(168, 85, 247, 0.45);
@@ -88,8 +101,11 @@
       <p class="sub">静态页面，可直接在浏览器打开。部署后可通过公网链接分享给他人。</p>
       <div class="grid">
         <a class="card" href="aespa/index.html">
-          <strong>aespa 女团资料</strong>
-          <span>简介 · MV · 歌词 · 历程</span>
+          <img class="card-thumb" src="aespa/images/lemonade-cover.jpg" alt="" width="72" height="72" loading="lazy" />
+          <div class="card-body">
+            <strong>aespa 女团资料</strong>
+            <span>成员相册 · 15 首 MV · 歌词解读 · 2026 LEMONADE 回归</span>
+          </div>
         </a>
         <a class="card" href="thunder-fighter/index.html">
           <strong>雷霆战机</strong>

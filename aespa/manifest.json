@@ -1,0 +1,14 @@
+{
+  "name": "aespa 女团资料",
+  "short_name": "aespa",
+  "description": "aespa 成员、MV、歌词与 LEMONADE 最新回归资料",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#050508",
+  "theme_color": "#a855f7",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "images/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "images/lemonade-cover.jpg", "sizes": "512x512", "type": "image/jpeg", "purpose": "any maskable" }
+  ]
+}
