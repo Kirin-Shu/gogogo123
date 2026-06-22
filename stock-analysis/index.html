@@ -3,18 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>股票分析</title>
+    <title>股票分析 · 实时行情</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
       :root {
-        --bg: #0d1117;
-        --card: #161b22;
-        --border: #30363d;
+        --bg: #060a10;
+        --bg-elevated: rgba(18, 24, 34, 0.78);
+        --card: rgba(22, 28, 38, 0.72);
+        --card-solid: #161b22;
+        --border: rgba(88, 166, 255, 0.12);
+        --border-strong: rgba(48, 54, 61, 0.65);
         --text: #e6edf3;
         --muted: #8b949e;
         --up: #f85149;
         --down: #3fb950;
         --accent: #58a6ff;
+        --live: #3fb950;
+        --glow-up: rgba(248, 81, 73, 0.14);
+        --glow-down: rgba(63, 185, 80, 0.12);
+        --glow-accent: rgba(88, 166, 255, 0.16);
       }
       * {
         box-sizing: border-box;
@@ -26,20 +33,185 @@
         color: var(--text);
         line-height: 1.5;
         min-height: 100vh;
+        position: relative;
+        isolation: isolate;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -3;
+        background:
+          radial-gradient(ellipse 110% 70% at 50% -15%, rgba(88, 166, 255, 0.22), transparent 58%),
+          radial-gradient(ellipse 55% 45% at 8% 42%, var(--glow-down), transparent 52%),
+          radial-gradient(ellipse 50% 40% at 92% 58%, var(--glow-up), transparent 50%),
+          radial-gradient(ellipse 80% 55% at 50% 105%, rgba(88, 166, 255, 0.1), transparent 55%),
+          linear-gradient(165deg, #0a1018 0%, #060a10 38%, #070d14 68%, #050810 100%);
+        pointer-events: none;
+      }
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        background-image:
+          linear-gradient(rgba(88, 166, 255, 0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(88, 166, 255, 0.045) 1px, transparent 1px);
+        background-size: 52px 52px;
+        mask-image: radial-gradient(ellipse 95% 75% at 50% 25%, black 15%, transparent 72%);
+        pointer-events: none;
+      }
+      .bg-ambient {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      .bg-ambient span {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(72px);
+        opacity: 0.55;
+        animation: drift 22s ease-in-out infinite;
+      }
+      .bg-ambient span:nth-child(1) {
+        width: 420px;
+        height: 420px;
+        top: -8%;
+        left: 12%;
+        background: rgba(63, 185, 80, 0.18);
+        animation-delay: 0s;
+      }
+      .bg-ambient span:nth-child(2) {
+        width: 380px;
+        height: 380px;
+        top: 38%;
+        right: -6%;
+        background: rgba(248, 81, 73, 0.14);
+        animation-delay: -7s;
+        animation-duration: 26s;
+      }
+      .bg-ambient span:nth-child(3) {
+        width: 320px;
+        height: 320px;
+        bottom: -5%;
+        left: 28%;
+        background: rgba(88, 166, 255, 0.16);
+        animation-delay: -14s;
+        animation-duration: 28s;
+      }
+      @keyframes drift {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+        33% {
+          transform: translate(18px, -24px) scale(1.04);
+        }
+        66% {
+          transform: translate(-14px, 16px) scale(0.96);
+        }
       }
       header {
         padding: 20px 20px 12px;
-        border-bottom: 1px solid var(--border);
-        background: linear-gradient(180deg, #121820, var(--bg));
+        border-bottom: 1px solid var(--border-strong);
+        background: linear-gradient(180deg, rgba(14, 20, 30, 0.92), rgba(8, 12, 18, 0.55));
+        backdrop-filter: blur(16px) saturate(1.2);
+        -webkit-backdrop-filter: blur(16px) saturate(1.2);
+        position: relative;
+      }
+      header::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(88, 166, 255, 0.35), transparent);
+        pointer-events: none;
       }
       h1 {
         margin: 0 0 6px;
         font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        color: var(--text);
+      }
+      h1 .title-text {
+        background: linear-gradient(135deg, #f0f6fc 0%, #c9d1d9 45%, #58a6ff 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
       }
       .sub {
         margin: 0;
         font-size: 0.85rem;
         color: var(--muted);
+      }
+      .status-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px 16px;
+        margin-top: 12px;
+        padding: 10px 14px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 0.82rem;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+      }
+      .live-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--muted);
+        flex-shrink: 0;
+      }
+      .live-dot.on {
+        background: var(--live);
+        box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.5);
+        animation: pulse 2s ease-in-out infinite;
+      }
+      .live-dot.paused {
+        background: #d29922;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.45);
+        }
+        50% {
+          box-shadow: 0 0 0 6px rgba(63, 185, 80, 0);
+        }
+      }
+      #statusText {
+        color: var(--text);
+        flex: 1 1 180px;
+      }
+      #countdown {
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+      }
+      .market-badge {
+        font-size: 0.72rem;
+        padding: 3px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--border-strong);
+        color: var(--muted);
+        background: rgba(13, 17, 23, 0.5);
+      }
+      .market-badge.open {
+        border-color: rgba(63, 185, 80, 0.45);
+        color: #7ee787;
+      }
+      .market-badge.closed {
+        border-color: rgba(139, 148, 158, 0.35);
       }
       main {
         max-width: 1100px;
@@ -61,31 +233,59 @@
         min-width: 160px;
         padding: 10px 12px;
         border-radius: 8px;
-        border: 1px solid var(--border);
-        background: var(--card);
+        border: 1px solid var(--border-strong);
+        background: rgba(13, 17, 23, 0.65);
         color: var(--text);
         font-size: 1rem;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      input[type="text"]:focus {
+        outline: none;
+        border-color: rgba(88, 166, 255, 0.55);
+        box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.12);
       }
       select {
         padding: 10px 12px;
         border-radius: 8px;
-        border: 1px solid var(--border);
-        background: var(--card);
+        border: 1px solid var(--border-strong);
+        background: rgba(13, 17, 23, 0.65);
         color: var(--text);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
       }
       button.primary {
         padding: 10px 20px;
         border: none;
         border-radius: 8px;
-        background: var(--accent);
+        background: linear-gradient(135deg, #4d9fff, #388bfd);
         color: #fff;
         font-weight: 600;
         cursor: pointer;
         min-width: 104px;
+        box-shadow: 0 4px 18px rgba(88, 166, 255, 0.28);
+        transition: transform 0.15s, box-shadow 0.15s;
+      }
+      button.primary:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 22px rgba(88, 166, 255, 0.38);
       }
       button.primary:disabled {
         opacity: 0.5;
         cursor: not-allowed;
+      }
+      .toggle-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      .toggle-row input {
+        accent-color: var(--accent);
+        width: 16px;
+        height: 16px;
       }
       .chips {
         display: flex;
@@ -96,14 +296,18 @@
         padding: 6px 10px;
         border-radius: 999px;
         border: 1px solid var(--border);
-        background: var(--card);
+        background: rgba(22, 27, 34, 0.55);
         font-size: 0.8rem;
         cursor: pointer;
         color: var(--muted);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        transition: border-color 0.2s, color 0.2s, background 0.2s;
       }
       .chip:hover {
-        border-color: var(--accent);
+        border-color: rgba(88, 166, 255, 0.45);
         color: var(--text);
+        background: rgba(88, 166, 255, 0.08);
       }
       .grid {
         display: grid;
@@ -114,8 +318,20 @@
       .card {
         background: var(--card);
         border: 1px solid var(--border);
-        border-radius: 10px;
+        border-radius: 12px;
         padding: 14px;
+        transition: border-color 0.35s, background 0.35s, box-shadow 0.35s;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+      }
+      .card.flash-up {
+        border-color: rgba(248, 81, 73, 0.55);
+        background: rgba(248, 81, 73, 0.08);
+      }
+      .card.flash-down {
+        border-color: rgba(63, 185, 80, 0.55);
+        background: rgba(63, 185, 80, 0.08);
       }
       .card .k {
         font-size: 0.75rem;
@@ -138,11 +354,14 @@
       .chart-wrap {
         background: var(--card);
         border: 1px solid var(--border);
-        border-radius: 12px;
+        border-radius: 14px;
         padding: 16px;
         margin-bottom: 20px;
         position: relative;
         height: 380px;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.04);
       }
       .chart-wrap.loading::after {
         content: "图表加载中…";
@@ -151,11 +370,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(13, 17, 23, 0.55);
+        background: rgba(6, 10, 16, 0.62);
         border-radius: 8px;
         color: var(--muted);
         font-size: 0.9rem;
         pointer-events: none;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
       }
       table {
         width: 100%;
@@ -163,14 +384,17 @@
         font-size: 0.9rem;
         background: var(--card);
         border: 1px solid var(--border);
-        border-radius: 10px;
+        border-radius: 12px;
         overflow: hidden;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
       }
       th,
       td {
         padding: 10px 14px;
         text-align: left;
-        border-bottom: 1px solid var(--border);
+        border-bottom: 1px solid var(--border-strong);
       }
       th {
         color: var(--muted);
@@ -198,30 +422,60 @@
         color: var(--muted);
         font-size: 0.8rem;
         text-align: center;
-        border-top: 1px solid var(--border);
+        border-top: 1px solid var(--border-strong);
+        background: linear-gradient(180deg, transparent, rgba(8, 12, 18, 0.65));
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .bg-ambient span {
+          animation: none;
+        }
       }
     </style>
   </head>
   <body>
+    <div class="bg-ambient" aria-hidden="true"><span></span><span></span><span></span></div>
     <header>
-      <h1>股票分析</h1>
-      <p class="sub">行情来自 Yahoo Finance（经网络拉取；直连失败时会走公共 CORS 代理）。A 股示例需带交易所后缀，如 <code>600519.SS</code>、<code>000001.SZ</code>。若双击文件无法拉取数据，请用 <code>python -m http.server</code> 在本目录启动后访问 <code>http://127.0.0.1:端口/</code>。仅供学习参考，不构成投资建议。</p>
+      <h1><span class="title-text">股票分析</span> <span class="market-badge closed" id="marketBadge">—</span></h1>
+      <p class="sub">
+        优先使用<strong>东方财富 / 腾讯 / 新浪</strong>（国内可直接访问）。A 股：<code>600519.SS</code>、<code>000001.SZ</code>；美股：<code>AAPL</code>。仅供学习参考。
+      </p>
+      <div class="status-bar">
+        <span class="live-dot" id="liveDot" aria-hidden="true"></span>
+        <span id="statusText">等待首次加载…</span>
+        <span id="countdown"></span>
+      </div>
     </header>
     <main>
       <div class="err" id="err"></div>
       <div class="toolbar">
         <div>
           <label for="sym">代码</label><br />
-          <input id="sym" type="text" placeholder="AAPL 或 600519.SS" value="AAPL" autocomplete="off" />
+          <input id="sym" type="text" placeholder="AAPL 或 600519.SS" value="600519.SS" autocomplete="off" />
         </div>
         <div>
           <label for="range">区间</label><br />
           <select id="range">
+            <option value="1d">今日（5 分钟）</option>
             <option value="1mo">1 个月</option>
             <option value="3mo" selected>3 个月</option>
             <option value="6mo">6 个月</option>
             <option value="1y">1 年</option>
           </select>
+        </div>
+        <div>
+          <label for="refresh">自动刷新</label><br />
+          <select id="refresh">
+            <option value="0">关闭</option>
+            <option value="15">每 15 秒</option>
+            <option value="30" selected>每 30 秒</option>
+            <option value="60">每 60 秒</option>
+          </select>
+        </div>
+        <div class="toggle-row" style="align-self: flex-end; padding-bottom: 10px">
+          <input type="checkbox" id="prePost" checked />
+          <label for="prePost">含盘前/盘后</label>
         </div>
         <div style="align-self: flex-end">
           <button class="primary" id="go" type="button">分析</button>
@@ -248,24 +502,35 @@
         <tbody id="metrics"></tbody>
       </table>
     </main>
-    <footer>数据延迟与缺失以 Yahoo 为准；公共代理可能不稳定，生产环境请自建后端转发。</footer>
+    <footer>数据延迟以各数据源为准；A 股/美股优先走国内接口，Yahoo 仅在备用链路可用时启用。</footer>
 
     <script>
       (function () {
-        const chips = ["AAPL", "MSFT", "GOOGL", "TSLA", "600519.SS", "000001.SZ"];
+        const chips = ["600519.SS", "000001.SZ", "AAPL", "MSFT", "GOOGL", "TSLA"];
         const symEl = document.getElementById("sym");
         const rangeEl = document.getElementById("range");
+        const refreshEl = document.getElementById("refresh");
+        const prePostEl = document.getElementById("prePost");
         const goBtn = document.getElementById("go");
         const errEl = document.getElementById("err");
         const cardsEl = document.getElementById("cards");
         const metricsEl = document.getElementById("metrics");
         const chipBox = document.getElementById("chips");
         const chartWrap = document.getElementById("chartWrap");
+        const statusText = document.getElementById("statusText");
+        const countdownEl = document.getElementById("countdown");
+        const liveDot = document.getElementById("liveDot");
+        const marketBadge = document.getElementById("marketBadge");
 
-        const LS_KEY = "stock-analysis:v1";
+        const LS_KEY = "stock-analysis:v2";
         let chart;
         let loadSeq = 0;
         let abortCtl = null;
+        let refreshTimer = null;
+        let countdownTimer = null;
+        let nextRefreshAt = 0;
+        let lastPrice = null;
+        let hasData = false;
         const goDefaultLabel = "分析";
 
         chips.forEach((c) => {
@@ -275,7 +540,7 @@
           b.textContent = c;
           b.addEventListener("click", () => {
             symEl.value = c;
-            load();
+            load({ silent: false });
           });
           chipBox.appendChild(b);
         });
@@ -285,13 +550,29 @@
             const j = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
             if (j.sym && typeof j.sym === "string") symEl.value = j.sym;
             if (j.range && rangeEl.querySelector(`option[value="${j.range}"]`)) rangeEl.value = j.range;
+            if (j.refresh != null && refreshEl.querySelector(`option[value="${String(j.refresh)}"]`)) {
+              refreshEl.value = String(j.refresh);
+            }
+            if (typeof j.prePost === "boolean") prePostEl.checked = j.prePost;
           } catch (_) {}
         }
 
         function savePrefs(sym, range) {
           try {
-            localStorage.setItem(LS_KEY, JSON.stringify({ sym, range }));
+            localStorage.setItem(
+              LS_KEY,
+              JSON.stringify({
+                sym,
+                range,
+                refresh: Number(refreshEl.value),
+                prePost: prePostEl.checked,
+              }),
+            );
           } catch (_) {}
+        }
+
+        function refreshIntervalMs() {
+          return Number(refreshEl.value) * 1000;
         }
 
         function setLoading(on) {
@@ -301,9 +582,538 @@
         }
 
         function intervalForRange(range) {
-          if (range === "1y") return "1d";
-          if (range === "6mo") return "1d";
+          if (range === "1d") return "5m";
           return "1d";
+        }
+
+        function marketStateLabel(state) {
+          const map = {
+            REGULAR: "交易中",
+            PRE: "盘前",
+            POST: "盘后",
+            PREPRE: "盘前",
+            POSTPOST: "盘后",
+            CLOSED: "休市",
+          };
+          return map[state] || state || "—";
+        }
+
+        function setMarketBadge(meta) {
+          const state = meta && meta.marketState;
+          const label = marketStateLabel(state);
+          marketBadge.textContent = label;
+          marketBadge.className = "market-badge " + (state === "REGULAR" || state === "PRE" || state === "POST" ? "open" : "closed");
+        }
+
+        function setStatus(msg, live) {
+          statusText.textContent = msg;
+          liveDot.className = "live-dot" + (live === "on" ? " on" : live === "paused" ? " paused" : "");
+        }
+
+        function stopCountdown() {
+          if (countdownTimer) {
+            clearInterval(countdownTimer);
+            countdownTimer = null;
+          }
+          countdownEl.textContent = "";
+        }
+
+        function startCountdown() {
+          stopCountdown();
+          const ms = refreshIntervalMs();
+          if (!ms || !hasData) return;
+          nextRefreshAt = Date.now() + ms;
+          countdownTimer = setInterval(() => {
+            const left = Math.max(0, Math.ceil((nextRefreshAt - Date.now()) / 1000));
+            countdownEl.textContent = left > 0 ? left + " 秒后刷新" : "刷新中…";
+          }, 500);
+        }
+
+        function stopAutoRefresh() {
+          if (refreshTimer) {
+            clearInterval(refreshTimer);
+            refreshTimer = null;
+          }
+          stopCountdown();
+          if (!hasData) setStatus("等待首次加载…", null);
+          else setStatus(statusText.textContent.replace(/ · 自动刷新.*/, ""), null);
+        }
+
+        function startAutoRefresh() {
+          stopAutoRefresh();
+          const ms = refreshIntervalMs();
+          if (!ms) {
+            if (hasData) setStatus(statusText.textContent.split(" · ")[0] + " · 自动刷新已关闭", null);
+            return;
+          }
+          setStatus((statusText.textContent.split(" · ")[0] || "已加载") + " · 自动刷新每 " + refreshEl.options[refreshEl.selectedIndex].text.replace("每 ", ""), "on");
+          startCountdown();
+          refreshTimer = setInterval(() => {
+            if (document.hidden) return;
+            load({ silent: true });
+          }, ms);
+        }
+
+        let lastDataSource = "";
+        let lastSnapshot = null;
+        let lastFullFetchAt = 0;
+        const providerCache = {};
+        const FETCH_TIMEOUT = 6500;
+        const QUOTE_TIMEOUT = 3500;
+        const FULL_REFRESH_MS = 120000;
+
+        function cacheKey(info, range) {
+          return info.display + "|" + range;
+        }
+
+        function withTimeout(promise, ms, label) {
+          return new Promise((resolve, reject) => {
+            const t = setTimeout(() => reject(new Error((label || "请求") + "超时")), ms);
+            Promise.resolve(promise).then(
+              (v) => {
+                clearTimeout(t);
+                resolve(v);
+              },
+              (e) => {
+                clearTimeout(t);
+                reject(e);
+              },
+            );
+          });
+        }
+
+        function raceFirst(promises) {
+          return new Promise((resolve, reject) => {
+            if (!promises.length) {
+              reject(new Error("无可用数据源"));
+              return;
+            }
+            let pending = promises.length;
+            let firstErr = null;
+            promises.forEach((p) => {
+              Promise.resolve(p).then(resolve, (e) => {
+                if (!firstErr) firstErr = e;
+                if (--pending === 0) reject(firstErr || new Error("全部数据源失败"));
+              });
+            });
+          });
+        }
+
+        function rememberProvider(info, range, source) {
+          providerCache[cacheKey(info, range)] = source;
+          try {
+            localStorage.setItem("stock-analysis:provider", JSON.stringify(providerCache));
+          } catch (_) {}
+        }
+
+        function loadProviderCache() {
+          try {
+            const j = JSON.parse(localStorage.getItem("stock-analysis:provider") || "{}");
+            Object.assign(providerCache, j);
+          } catch (_) {}
+        }
+        loadProviderCache();
+
+        function resolveSymbol(raw) {
+          const s = normalizeSymbol(raw);
+          const suffixed = s.match(/^(\d{6})\.(SS|SZ|SH)$/);
+          if (suffixed) {
+            const code = suffixed[1];
+            const mkt = code.startsWith("6") || code.startsWith("9") ? "1" : "0";
+            return {
+              kind: "cn",
+              code,
+              secid: mkt + "." + code,
+              tencent: (mkt === "1" ? "sh" : "sz") + code,
+              display: code + (mkt === "1" ? ".SS" : ".SZ"),
+              currency: "CNY",
+            };
+          }
+          if (/^\d{6}$/.test(s)) {
+            const mkt = s.startsWith("6") || s.startsWith("9") ? "1" : "0";
+            return {
+              kind: "cn",
+              code: s,
+              secid: mkt + "." + s,
+              tencent: (mkt === "1" ? "sh" : "sz") + s,
+              display: s + (mkt === "1" ? ".SS" : ".SZ"),
+              currency: "CNY",
+            };
+          }
+          const ticker = s.replace(/\.(US|NASDAQ|NYSE)$/i, "");
+          return {
+            kind: "us",
+            code: ticker,
+            tencent: "us" + ticker,
+            tencentKline: "us" + ticker + ".OQ",
+            display: ticker,
+            currency: "USD",
+            secidGuess: "105." + ticker,
+          };
+        }
+
+        function emRangeParams(range) {
+          if (range === "1d") return { klt: 5, lmt: 48 };
+          if (range === "1mo") return { klt: 101, lmt: 24 };
+          if (range === "3mo") return { klt: 101, lmt: 70 };
+          if (range === "6mo") return { klt: 101, lmt: 140 };
+          return { klt: 101, lmt: 280 };
+        }
+
+        function parseEmKlineLine(line) {
+          const p = line.split(",");
+          let t;
+          if (/^\d{12}$/.test(p[0])) {
+            const d = p[0];
+            t = new Date(
+              d.slice(0, 4) + "-" + d.slice(4, 6) + "-" + d.slice(6, 8) + "T" + d.slice(8, 10) + ":" + d.slice(10, 12) + ":00",
+            ).getTime();
+          } else if (p[0].includes(" ")) {
+            t = new Date(p[0].replace(" ", "T")).getTime();
+          } else {
+            t = new Date(p[0] + "T15:00:00").getTime();
+          }
+          return { t, o: +p[1], c: +p[2], h: +p[3], l: +p[4], v: +p[5] || 0 };
+        }
+
+        function parseTencentBar(row) {
+          if (Array.isArray(row)) {
+            const d = String(row[0]);
+            let t;
+            if (/^\d{12}$/.test(d)) {
+              t = new Date(
+                d.slice(0, 4) + "-" + d.slice(4, 6) + "-" + d.slice(6, 8) + "T" + d.slice(8, 10) + ":" + d.slice(10, 12) + ":00",
+              ).getTime();
+            } else {
+              t = new Date(d + "T12:00:00").getTime();
+            }
+            return { t, o: +row[1], c: +row[2], h: +row[3], l: +row[4], v: +row[5] || 0 };
+          }
+          return null;
+        }
+
+        function buildMetaFromSeries(info, name, series, quote) {
+          const last = series[series.length - 1];
+          const prevClose =
+            quote && quote.prevClose
+              ? quote.prevClose
+              : series.length > 1
+                ? series[series.length - 2].c
+                : last.o;
+          const px = quote && quote.price ? quote.price : last.c;
+          const highs = series.map((x) => x.h).filter(Number.isFinite);
+          const lows = series.map((x) => x.l).filter(Number.isFinite);
+          return {
+            symbol: info.display,
+            longName: (quote && quote.name) || name || info.display,
+            shortName: (quote && quote.name) || name || info.display,
+            regularMarketPrice: px,
+            chartPreviousClose: prevClose,
+            previousClose: prevClose,
+            regularMarketDayHigh: quote && quote.high ? quote.high : Math.max(...highs),
+            regularMarketDayLow: quote && quote.low ? quote.low : Math.min(...lows),
+            regularMarketVolume: quote && quote.volume ? quote.volume : last.v,
+            currency: info.currency,
+            marketState: "REGULAR",
+            fiftyTwoWeekHigh: Math.max(...highs),
+            fiftyTwoWeekLow: Math.min(...lows),
+          };
+        }
+
+        async function resolveUsSecid(ticker, signal) {
+          return "105." + ticker;
+        }
+
+        async function fetchEastMoney(info, range, signal, opts) {
+          const enrichQuote = opts && opts.enrichQuote;
+          const secid = info.kind === "us" ? await resolveUsSecid(info.code, signal) : info.secid;
+          const { klt, lmt } = emRangeParams(range);
+          const url =
+            "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=" +
+            encodeURIComponent(secid) +
+            "&klt=" +
+            klt +
+            "&fqt=1&beg=0&end=20500000&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&lmt=" +
+            lmt;
+          const r = await fetch(url, {
+            signal,
+            cache: "no-store",
+            referrer: "https://quote.eastmoney.com/",
+            headers: { Accept: "application/json, text/plain, */*" },
+          });
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          const j = await r.json();
+          const data = j.data;
+          if (!data || !data.klines || !data.klines.length) throw new Error("无 K 线数据");
+          const series = data.klines.map(parseEmKlineLine).filter((x) => Number.isFinite(x.c) && x.c > 0);
+          if (series.length < 2) throw new Error("有效 K 线过少");
+          let quote = null;
+          if (enrichQuote) {
+            try {
+              quote = await withTimeout(loadTencentQuote(tencentQuoteCode(info)), QUOTE_TIMEOUT, "腾讯报价");
+            } catch (_) {}
+          }
+          return {
+            meta: buildMetaFromSeries(info, data.name, series, quote),
+            series,
+            source: "东方财富",
+          };
+        }
+
+        function loadTencentQuote(code) {
+          return new Promise((resolve, reject) => {
+            const varName = "v_" + code;
+            const backup = window[varName];
+            const script = document.createElement("script");
+            script.charset = "GBK";
+            script.src = "https://qt.gtimg.cn/q=" + encodeURIComponent(code) + "&_=" + Date.now();
+            const timer = setTimeout(() => {
+              script.remove();
+              reject(new Error("腾讯报价超时"));
+            }, QUOTE_TIMEOUT);
+            script.onload = () => {
+              clearTimeout(timer);
+              const raw = window[varName];
+              if (backup === undefined) {
+                try {
+                  delete window[varName];
+                } catch (_) {
+                  window[varName] = undefined;
+                }
+              } else {
+                window[varName] = backup;
+              }
+              script.remove();
+              if (!raw) {
+                reject(new Error("腾讯行情为空"));
+                return;
+              }
+              const p = raw.split("~");
+              const isCn = p[0] === "1" || p[0] === "51";
+              resolve({
+                name: p[1],
+                symbol: p[2],
+                price: parseFloat(p[3]),
+                prevClose: parseFloat(p[4]),
+                open: parseFloat(p[5]),
+                volume: parseFloat(p[6]) * (isCn ? 100 : 1),
+                high: parseFloat(p[33]) || parseFloat(p[4]),
+                low: parseFloat(p[34]) || parseFloat(p[4]),
+              });
+            };
+            script.onerror = () => {
+              clearTimeout(timer);
+              script.remove();
+              reject(new Error("腾讯脚本加载失败"));
+            };
+            document.head.appendChild(script);
+          });
+        }
+
+        function pickTencentBars(block, range) {
+          if (!block) return [];
+          if (range === "1d") return block.m5 || block.m1 || [];
+          return block.qfqday || block.day || block.hfqday || [];
+        }
+
+        function fqklineParam(code, range) {
+          const days = range === "1y" ? 320 : range === "6mo" ? 160 : range === "3mo" ? 90 : 30;
+          const end = new Date();
+          const start = new Date(end);
+          start.setDate(start.getDate() - days - 5);
+          const fmt = (d) =>
+            d.getFullYear() +
+            "-" +
+            String(d.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(d.getDate()).padStart(2, "0");
+          return code + ",day," + fmt(start) + "," + fmt(end) + "," + days + ",qfq";
+        }
+
+        function tencentKlineCode(info) {
+          return info.tencentKline || info.tencent;
+        }
+
+        function tencentQuoteCode(info) {
+          return info.tencentQuote || info.tencent;
+        }
+
+        function fqklineIntradayParam(code) {
+          const end = new Date();
+          const fmt = (d) =>
+            d.getFullYear() +
+            "-" +
+            String(d.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(d.getDate()).padStart(2, "0");
+          return code + ",m5," + fmt(end) + "," + fmt(end) + ",200,";
+        }
+
+        async function buildUsIntradayFromQuote(info, quoteFromQt) {
+          let quote = quoteFromQt;
+          if (!quote || !Number.isFinite(quote.price)) {
+            quote = await withTimeout(loadTencentQuote(tencentQuoteCode(info)), QUOTE_TIMEOUT, "腾讯报价");
+          }
+          const today = new Date().toISOString().slice(0, 10);
+          const openTs = new Date(today + "T09:30:00-04:00").getTime();
+          const nowTs = Date.now();
+          const px = quote.price;
+          const op = quote.open || px;
+          const hi = Math.max(op, px, quote.high || px);
+          const lo = Math.min(op, px, quote.low || px);
+          return [
+            { t: openTs, o: op, c: op, h: op, l: op, v: 0 },
+            { t: nowTs, o: op, c: px, h: hi, l: lo, v: quote.volume || 0 },
+          ];
+        }
+
+        async function fetchTencentKline(info, range, signal) {
+          const code = tencentKlineCode(info);
+          let name = info.display;
+          let quoteFromQt = null;
+          let block;
+
+          if (range === "1d") {
+            if (info.kind === "us") {
+              const url =
+                "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=" +
+                encodeURIComponent(fqklineIntradayParam(code));
+              const r = await fetch(url, { signal, cache: "no-store" });
+              if (!r.ok) throw new Error("HTTP " + r.status);
+              const j = await r.json();
+              block = j.data && j.data[code];
+            } else {
+              const url =
+                "https://ifzq.gtimg.cn/appstock/app/kline/mkline?param=" + encodeURIComponent(code + ",m5,,48");
+              const r = await fetch(url, { signal, cache: "no-store" });
+              if (!r.ok) throw new Error("HTTP " + r.status);
+              const j = await r.json();
+              block = j.data && j.data[code];
+            }
+          } else {
+            const url =
+              "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=" +
+              encodeURIComponent(fqklineParam(code, range));
+            const r = await fetch(url, { signal, cache: "no-store" });
+            if (!r.ok) throw new Error("HTTP " + r.status);
+            const j = await r.json();
+            block = j.data && j.data[code];
+          }
+
+          let series = pickTencentBars(block, range).map(parseTencentBar).filter(Boolean);
+          if (block && block.qt && block.qt[code]) {
+            const qt = block.qt[code];
+            name = qt[1] || name;
+            quoteFromQt = {
+              name: qt[1],
+              symbol: qt[2],
+              price: parseFloat(qt[3]),
+              prevClose: parseFloat(qt[4]),
+              open: parseFloat(qt[5]),
+              volume: parseFloat(qt[6]) * (qt[0] === "1" ? 100 : 1),
+              high: parseFloat(qt[33]) || parseFloat(qt[4]),
+              low: parseFloat(qt[34]) || parseFloat(qt[4]),
+            };
+          }
+
+          if (series.length < 2 && info.kind === "us" && range === "1d") {
+            series = await buildUsIntradayFromQuote(info, quoteFromQt);
+          }
+          if (series.length < 2) throw new Error("无日 K 数据");
+          return {
+            meta: buildMetaFromSeries(info, name, series, quoteFromQt),
+            series,
+            source: "腾讯行情",
+          };
+        }
+
+        function sinaDatalen(range) {
+          if (range === "1d") return 48;
+          if (range === "1mo") return 24;
+          if (range === "3mo") return 70;
+          if (range === "6mo") return 140;
+          return 280;
+        }
+
+        function sinaScale(range) {
+          return range === "1d" ? 5 : 240;
+        }
+
+        function parseSinaBar(row) {
+          return {
+            t: new Date(String(row.day) + "T15:00:00").getTime(),
+            o: +row.open,
+            c: +row.close,
+            h: +row.high,
+            l: +row.low,
+            v: +row.volume || 0,
+          };
+        }
+
+        function fetchSinaKline(info, range) {
+          const cb = "_sinaK_" + Date.now();
+          const scale = sinaScale(range);
+          const datalen = sinaDatalen(range);
+          const url =
+            "https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=" +
+            encodeURIComponent(info.tencent) +
+            "&scale=" +
+            scale +
+            "&ma=no&datalen=" +
+            datalen +
+            "&callback=" +
+            cb;
+          return new Promise((resolve, reject) => {
+            let script = null;
+            const timer = setTimeout(() => {
+              cleanup();
+              reject(new Error("新浪 K 线超时"));
+            }, FETCH_TIMEOUT);
+            function cleanup() {
+              clearTimeout(timer);
+              delete window[cb];
+              if (script && script.parentNode) script.remove();
+            }
+            window[cb] = function (rows) {
+              cleanup();
+              if (!rows || !rows.length) {
+                reject(new Error("新浪无 K 线"));
+                return;
+              }
+              const series = rows.map(parseSinaBar).filter((x) => Number.isFinite(x.c) && x.c > 0);
+              if (series.length < 2) {
+                reject(new Error("新浪 K 线过少"));
+                return;
+              }
+              resolve({
+                meta: buildMetaFromSeries(info, info.display, series, null),
+                series,
+                source: "新浪财经",
+              });
+            };
+            script = document.createElement("script");
+            script.charset = "UTF-8";
+            script.src = url;
+            script.onerror = () => {
+              cleanup();
+              reject(new Error("新浪脚本失败"));
+            };
+            document.head.appendChild(script);
+          });
+        }
+
+        async function refreshQuoteOnly(info, snap) {
+          const quote = await withTimeout(loadTencentQuote(tencentQuoteCode(info)), QUOTE_TIMEOUT, "腾讯报价");
+          const series = snap.series.map((x) => ({ ...x }));
+          const last = series[series.length - 1];
+          last.c = quote.price;
+          if (quote.volume) last.v = quote.volume;
+          return {
+            meta: buildMetaFromSeries(info, quote.name || snap.meta.longName, series, quote),
+            series,
+            source: snap.source,
+            quoteOnly: true,
+          };
         }
 
         function yahooChartError(json) {
@@ -311,11 +1121,6 @@
           if (!e) return null;
           if (typeof e === "string") return e;
           return e.description || e.code || "Yahoo 返回错误";
-        }
-
-        function showErr(msg) {
-          errEl.textContent = msg;
-          errEl.classList.toggle("show", !!msg);
         }
 
         function yahooUrlMirror(url) {
@@ -329,7 +1134,7 @@
           try {
             return JSON.parse(text);
           } catch (_) {
-            throw new Error(label + "：JSON 解析失败（可能被返回了 HTML 或空页）");
+            throw new Error(label + "：JSON 解析失败");
           }
         }
 
@@ -341,11 +1146,10 @@
           const attempts = [];
           for (const target of targets) {
             attempts.push(
+              ["corsproxy.io", "https://corsproxy.io/?" + encodeURIComponent(target)],
               ["allorigins(raw)", "https://api.allorigins.win/raw?url=" + encodeURIComponent(target)],
               ["allorigins(get)", "https://api.allorigins.win/get?url=" + encodeURIComponent(target)],
-              ["corsproxy.io", "https://corsproxy.io/?" + encodeURIComponent(target)],
-              ["codetabs", "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(target)],
-              ["直连 Yahoo", target]
+              ["直连 Yahoo", target],
             );
           }
 
@@ -355,41 +1159,136 @@
             try {
               if (name === "allorigins(get)") {
                 const r = await fetch(u, { cache: "no-store", signal });
-                if (!r.ok) {
-                  last = new Error(name + "：" + r.status + " " + r.statusText);
-                  continue;
-                }
+                if (!r.ok) continue;
                 const outer = await r.json();
                 const c = outer && outer.contents;
-                if (c == null) {
-                  last = new Error(name + "：返回无 contents");
-                  continue;
-                }
-                const text = typeof c === "string" ? c : JSON.stringify(c);
-                last = null;
-                return parseJsonBody(text, name);
+                if (c == null) continue;
+                return parseJsonBody(typeof c === "string" ? c : JSON.stringify(c), name);
               }
-
               const r = await fetch(u, { cache: "no-store", signal, redirect: "follow" });
-              if (!r.ok) {
-                last = new Error(name + "：" + r.status + " " + r.statusText);
-                continue;
-              }
-              const t = await r.text();
-              last = null;
-              return parseJsonBody(t, name);
+              if (!r.ok) continue;
+              return parseJsonBody(await r.text(), name);
             } catch (e) {
               if (e.name === "AbortError") throw e;
               last = e;
             }
           }
+          throw last || new Error("Yahoo 全部链路失败");
+        }
 
-          const hint =
-            "（直连 Yahoo 在浏览器里通常会被跨域拦截；若全部代理失败，请用 http://localhost 打开页面而非 file://，并暂时关闭广告拦截；部分地区访问 Yahoo 需稳定出境网络。）";
-          if (last && String(last.message || "").includes("Failed to fetch")) {
-            throw new Error("无法连接数据接口（Failed to fetch）" + hint);
+        function buildYahooUrl(sym, range) {
+          const interval = intervalForRange(range);
+          const params = new URLSearchParams({ range, interval });
+          if (prePostEl.checked) params.set("includePrePost", "true");
+          return (
+            "https://query1.finance.yahoo.com/v8/finance/chart/" +
+            encodeURIComponent(sym) +
+            "?" +
+            params.toString()
+          );
+        }
+
+        async function fetchYahoo(sym, range, signal) {
+          const json = await withTimeout(fetchJsonAny(buildYahooUrl(sym, range), signal), 5000, "Yahoo");
+          const yErr = yahooChartError(json);
+          if (yErr) throw new Error(yErr);
+          const res = json.chart.result && json.chart.result[0];
+          if (!res) throw new Error("无数据");
+          const meta = res.meta;
+          const series = zipSeries(res.timestamp, res.indicators.quote[0]);
+          if (series.length < 2) throw new Error("有效 K 线过少");
+          return { meta, series, source: "Yahoo Finance" };
+        }
+
+        async function enrichWithQuote(info, result) {
+          try {
+            const quote = await withTimeout(loadTencentQuote(tencentQuoteCode(info)), QUOTE_TIMEOUT, "腾讯报价");
+            result.meta = buildMetaFromSeries(info, result.meta.longName, result.series, quote);
+          } catch (_) {}
+          return result;
+        }
+
+        async function fetchMarketData(sym, range, signal, opts) {
+          const silent = opts && opts.silent;
+          const info = resolveSymbol(sym);
+          const key = cacheKey(info, range);
+          const preferred = providerCache[key];
+
+          if (
+            silent &&
+            lastSnapshot &&
+            lastSnapshot.sym === sym &&
+            lastSnapshot.range === range &&
+            Date.now() - lastFullFetchAt < FULL_REFRESH_MS
+          ) {
+            try {
+              return await refreshQuoteOnly(info, lastSnapshot);
+            } catch (_) {}
           }
-          throw last || new Error("网络请求失败" + hint);
+
+          const emTask = withTimeout(fetchEastMoney(info, range, signal, { enrichQuote: false }), FETCH_TIMEOUT, "东方财富");
+          const tcTask = withTimeout(fetchTencentKline(info, range, signal), FETCH_TIMEOUT, "腾讯");
+          const sinaTask =
+            info.kind === "cn"
+              ? withTimeout(fetchSinaKline(info, range), FETCH_TIMEOUT, "新浪财经")
+              : null;
+
+          const tasks = [];
+          if (preferred === "新浪财经" && sinaTask) {
+            tasks.push(sinaTask, emTask, tcTask);
+          } else if (preferred === "腾讯行情") {
+            tasks.push(tcTask, emTask);
+            if (sinaTask) tasks.push(sinaTask);
+          } else if (preferred === "东方财富") {
+            tasks.push(emTask, tcTask);
+            if (sinaTask) tasks.push(sinaTask);
+          } else if (info.kind === "cn") {
+            tasks.push(emTask, tcTask);
+            if (sinaTask) tasks.push(sinaTask);
+          } else if (info.kind === "us") {
+            tasks.push(tcTask, emTask);
+          } else {
+            tasks.push(emTask, tcTask);
+          }
+
+          try {
+            const result = await enrichWithQuote(info, await raceFirst(tasks.filter(Boolean)));
+            rememberProvider(info, range, result.source);
+            return result;
+          } catch (raceErr) {
+            if (raceErr.name === "AbortError") throw raceErr;
+          }
+
+          const errors = [];
+          const fallbacks = [emTask, tcTask, sinaTask].filter(Boolean);
+          for (const task of fallbacks) {
+            try {
+              const result = await enrichWithQuote(info, await task);
+              rememberProvider(info, range, result.source);
+              return result;
+            } catch (e) {
+              if (e.name === "AbortError") throw e;
+              errors.push(e.message || String(e));
+            }
+          }
+
+          if (info.kind === "us") {
+            try {
+              const result = await fetchYahoo(sym, range, signal);
+              rememberProvider(info, range, result.source);
+              return result;
+            } catch (e) {
+              if (e.name === "AbortError") throw e;
+              errors.push("Yahoo：" + (e.message || e));
+            }
+          }
+
+          throw new Error(errors.join("；") || "全部数据源不可用");
+        }
+
+        function showErr(msg) {
+          errEl.textContent = msg;
+          errEl.classList.toggle("show", !!msg);
         }
 
         function normalizeSymbol(s) {
@@ -478,7 +1377,26 @@
           return n >= 0 ? "+" + s : s;
         }
 
-        function setCards(meta, series, prevClose) {
+        function formatLabel(t, range) {
+          const d = new Date(t);
+          if (range === "1d") {
+            return d.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" });
+          }
+          return d.toLocaleDateString("zh-CN", { month: "numeric", day: "numeric" });
+        }
+
+        function formatTooltipTitle(t) {
+          const d = new Date(t);
+          return d.toLocaleString("zh-CN", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        }
+
+        function setCards(meta, series, prevClose, flash) {
           const last = series[series.length - 1];
           const px =
             meta.regularMarketPrice != null && Number.isFinite(meta.regularMarketPrice)
@@ -487,18 +1405,22 @@
           const chgDay =
             prevClose && Number.isFinite(prevClose) ? (px - prevClose) / prevClose : null;
           const chgRange =
-            series.length > 1 && Number.isFinite(series[0].c)
-              ? (last.c - series[0].c) / series[0].c
-              : null;
+            series.length > 1 && Number.isFinite(series[0].c) ? (last.c - series[0].c) / series[0].c : null;
           const cls = chgDay != null ? (chgDay >= 0 ? "up" : "down") : "";
           const signD = chgDay != null && chgDay >= 0 ? "+" : "";
           const signR = chgRange != null && chgRange >= 0 ? "+" : "";
           const clsR = chgRange != null ? (chgRange >= 0 ? "up" : "down") : "";
 
+          let flashCls = "";
+          if (flash && lastPrice != null && px !== lastPrice) {
+            flashCls = px > lastPrice ? "flash-up" : "flash-down";
+          }
+          lastPrice = px;
+
           const items = [
             ["名称", meta.longName || meta.shortName || meta.symbol, ""],
             ["代码", meta.symbol, ""],
-            ["最新价", fmt(px, 2), ""],
+            ["最新价", fmt(px, 2), cls],
             ["相对前收", chgDay != null ? signD + (chgDay * 100).toFixed(2) + "%" : "—", cls],
             ["区间涨跌", chgRange != null ? signR + (chgRange * 100).toFixed(2) + "%" : "—", clsR],
             ["货币", meta.currency || "—", ""],
@@ -509,11 +1431,19 @@
             ["成交量", meta.regularMarketVolume != null ? fmt(meta.regularMarketVolume, 0) : "—", ""],
           ];
           cardsEl.innerHTML = items
-            .map(
-              ([k, v, c]) =>
-                `<div class="card"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`,
-            )
+            .map(([k, v, c]) => {
+              const cardFlash = k === "最新价" && flashCls ? " " + flashCls : "";
+              return `<div class="card${cardFlash}"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`;
+            })
             .join("");
+
+          if (flashCls) {
+            setTimeout(() => {
+              cardsEl.querySelectorAll(".card.flash-up, .card.flash-down").forEach((el) => {
+                el.classList.remove("flash-up", "flash-down");
+              });
+            }, 800);
+          }
         }
 
         function setMetrics(series) {
@@ -530,23 +1460,20 @@
           const lastS20 = [...s20].reverse().find((x) => x != null);
 
           const rows = [
-            ["SMA5", lastS5 != null ? fmt(lastS5, 2) : "—", "最近 5 个交易日收盘均价"],
-            ["SMA20", lastS20 != null ? fmt(lastS20, 2) : "—", "最近 20 个交易日收盘均价"],
-            ["RSI(14)", lastRsi != null ? fmt(lastRsi, 1) : "—", "相对强弱，>70 偏热、<30 偏冷（简化 Wilder）"],
-            ["日收益波动率（样本）", vol != null ? fmt(vol * 100, 3) + "%" : "—", "对数日收益标准差"],
-            ["年化波动（粗估）", ann != null ? fmt(ann * 100, 1) + "%" : "—", "σ_daily × √252，仅供参考"],
-            ["首尾涨跌", closes.length > 1 ? pct(closes[closes.length - 1] / closes[0] - 1) : "—", "区间内第一根与最后一根收盘价"],
+            ["SMA5", lastS5 != null ? fmt(lastS5, 2) : "—", "最近 5 根 K 线收盘均价"],
+            ["SMA20", lastS20 != null ? fmt(lastS20, 2) : "—", "最近 20 根 K 线收盘均价"],
+            ["RSI(14)", lastRsi != null ? fmt(lastRsi, 1) : "—", "相对强弱，>70 偏热、<30 偏冷"],
+            ["日收益波动率", vol != null ? fmt(vol * 100, 3) + "%" : "—", "对数收益标准差"],
+            ["年化波动（粗估）", ann != null ? fmt(ann * 100, 1) + "%" : "—", "σ × √252"],
+            ["首尾涨跌", closes.length > 1 ? pct(closes[closes.length - 1] / closes[0] - 1) : "—", "区间内首尾收盘价"],
           ];
           metricsEl.innerHTML = rows
             .map(([a, b, c]) => `<tr><td>${a}</td><td>${b}</td><td style="color:var(--muted)">${c}</td></tr>`)
             .join("");
         }
 
-        function drawChart(series) {
-          const labels = series.map((x) => {
-            const d = new Date(x.t);
-            return d.toLocaleDateString("zh-CN", { month: "numeric", day: "numeric" });
-          });
+        function drawChart(series, range) {
+          const labels = series.map((x) => formatLabel(x.t, range));
           const prices = series.map((x) => x.c);
           const vols = series.map((x) => x.v);
 
@@ -565,7 +1492,7 @@
                   fill: true,
                   tension: 0.15,
                   yAxisID: "y",
-                  pointRadius: 0,
+                  pointRadius: range === "1d" ? 0 : 0,
                   borderWidth: 2,
                 },
                 {
@@ -580,6 +1507,7 @@
             options: {
               responsive: true,
               maintainAspectRatio: false,
+              animation: { duration: range === "1d" ? 0 : 300 },
               interaction: { mode: "index", intersect: false },
               plugins: {
                 legend: { labels: { color: "#8b949e" } },
@@ -588,12 +1516,7 @@
                     title(items) {
                       const i = items[0].dataIndex;
                       const t = series[i] && series[i].t;
-                      if (!t) return "";
-                      return new Date(t).toLocaleString("zh-CN", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                      });
+                      return t ? formatTooltipTitle(t) : "";
                     },
                     label(ctx) {
                       const v = ctx.parsed.y;
@@ -605,7 +1528,7 @@
               },
               scales: {
                 x: {
-                  ticks: { color: "#8b949e", maxTicksLimit: 8 },
+                  ticks: { color: "#8b949e", maxTicksLimit: range === "1d" ? 10 : 8 },
                   grid: { color: "rgba(48,54,61,0.6)" },
                 },
                 y: {
@@ -615,86 +1538,143 @@
                 },
                 y1: {
                   position: "right",
-                  ticks: { color: "#6e7681", callback: (v) => (v >= 1e9 ? v / 1e9 + "B" : v >= 1e6 ? v / 1e6 + "M" : v / 1e3 + "K") },
+                  ticks: {
+                    color: "#6e7681",
+                    callback: (v) =>
+                      v >= 1e9 ? v / 1e9 + "B" : v >= 1e6 ? v / 1e6 + "M" : v / 1e3 + "K",
+                  },
                   grid: { drawOnChartArea: false },
                 },
               },
             },
           });
+          chart._seriesRef = series;
+          chart._rangeRef = range;
         }
 
-        async function load() {
+        function updateChart(series, range) {
+          if (!chart || chart._rangeRef !== range) {
+            drawChart(series, range);
+            return;
+          }
+          chart.data.labels = series.map((x) => formatLabel(x.t, range));
+          chart.data.datasets[0].data = series.map((x) => x.c);
+          chart.data.datasets[1].data = series.map((x) => x.v);
+          chart._seriesRef = series;
+          chart.update("none");
+        }
+
+        async function load(opts) {
+          const silent = opts && opts.silent;
           showErr("");
-          symEl.removeAttribute("aria-invalid");
+          if (!silent) symEl.removeAttribute("aria-invalid");
           const sym = normalizeSymbol(symEl.value);
           if (!sym) {
-            showErr("请输入股票代码。");
-            symEl.setAttribute("aria-invalid", "true");
+            if (!silent) {
+              showErr("请输入股票代码。");
+              symEl.setAttribute("aria-invalid", "true");
+            }
             return;
           }
           const mySeq = ++loadSeq;
           if (abortCtl) abortCtl.abort();
           abortCtl = new AbortController();
           const signal = abortCtl.signal;
-          goBtn.disabled = true;
-          setLoading(true);
+          if (!silent) {
+            goBtn.disabled = true;
+            setLoading(true);
+          }
           try {
             const range = rangeEl.value;
-            const interval = intervalForRange(range);
-            const url =
-              "https://query1.finance.yahoo.com/v8/finance/chart/" +
-              encodeURIComponent(sym) +
-              "?range=" +
-              range +
-              "&interval=" +
-              interval;
-            const json = await fetchJsonAny(url, signal);
+            const result = await fetchMarketData(sym, range, signal, { silent });
             if (mySeq !== loadSeq) return;
-            const yErr = yahooChartError(json);
-            if (yErr) throw new Error(yErr);
-            const res = json.chart.result && json.chart.result[0];
-            if (!res) throw new Error("无数据（代码是否正确？）");
 
-            const meta = res.meta;
-            const ts = res.timestamp;
-            const quote = res.indicators.quote[0];
-            const series = zipSeries(ts, quote);
-            if (series.length < 2) throw new Error("有效 K 线过少，请换区间或代码。");
-
+            const meta = result.meta;
+            const series = result.series;
+            lastDataSource = result.source;
             const prevClose = meta.chartPreviousClose ?? meta.previousClose;
-            setCards(meta, series, prevClose);
+            setMarketBadge(meta);
+            setCards(meta, series, prevClose, silent || hasData);
             setMetrics(series);
-            drawChart(series);
+            if (silent && chart) updateChart(series, range);
+            else drawChart(series, range);
             savePrefs(sym, range);
+            hasData = true;
+            if (!result.quoteOnly) lastFullFetchAt = Date.now();
+            lastSnapshot = { sym, range, series, meta, source: result.source, info: resolveSymbol(sym) };
+
+            const updated = new Date().toLocaleTimeString("zh-CN");
+            const src = meta.symbol || sym;
+            const modeHint = result.quoteOnly ? " · 快速报价" : "";
+            const baseStatus = src + " · " + lastDataSource + modeHint + " · 更新于 " + updated;
+            if (refreshIntervalMs()) {
+              setStatus(baseStatus + " · 自动刷新每 " + refreshEl.options[refreshEl.selectedIndex].text.replace("每 ", ""), "on");
+              nextRefreshAt = Date.now() + refreshIntervalMs();
+            } else {
+              setStatus(baseStatus + " · 自动刷新已关闭", null);
+            }
           } catch (e) {
             if (e.name === "AbortError") return;
+            if (silent) {
+              setStatus("刷新失败（" + (e.message || "网络错误") + "）· 将重试", "paused");
+              return;
+            }
             console.error(e);
             showErr("加载失败：" + (e.message || String(e)) + "。可换网络、换代码或稍后重试。");
             symEl.setAttribute("aria-invalid", "true");
             cardsEl.innerHTML = "";
             metricsEl.innerHTML = "";
+            hasData = false;
+            lastPrice = null;
             if (chart) {
               chart.destroy();
               chart = null;
             }
+            setStatus("加载失败", null);
           } finally {
-            if (mySeq === loadSeq) {
+            if (mySeq === loadSeq && !silent) {
               goBtn.disabled = false;
               setLoading(false);
             }
           }
         }
 
-        goBtn.addEventListener("click", load);
+        function restartAutoRefresh() {
+          startAutoRefresh();
+        }
+
+        goBtn.addEventListener("click", () => {
+          lastPrice = null;
+          lastFullFetchAt = 0;
+          load({ silent: false });
+        });
         rangeEl.addEventListener("change", () => {
-          if (normalizeSymbol(symEl.value)) load();
+          lastPrice = null;
+          lastFullFetchAt = 0;
+          if (normalizeSymbol(symEl.value)) load({ silent: false });
+        });
+        refreshEl.addEventListener("change", restartAutoRefresh);
+        prePostEl.addEventListener("change", () => {
+          if (normalizeSymbol(symEl.value)) load({ silent: false });
         });
         symEl.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") load();
+          if (e.key === "Enter") {
+            lastPrice = null;
+            load({ silent: false });
+          }
+        });
+
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) {
+            setStatus((statusText.textContent.split(" · ")[0] || "已暂停") + " · 标签页隐藏，暂停刷新", "paused");
+          } else if (hasData && refreshIntervalMs()) {
+            load({ silent: true });
+            restartAutoRefresh();
+          }
         });
 
         loadPrefs();
-        load();
+        load({ silent: false }).then(() => restartAutoRefresh());
       })();
     </script>
   </body>

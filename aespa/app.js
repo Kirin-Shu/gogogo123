@@ -154,7 +154,7 @@
       })();
 
 (function () {
-        document.querySelectorAll(".comeback-btn[data-song]").forEach(function (btn) {
+        document.querySelectorAll(".comeback-btn[data-song], .update-link[data-song], .hero-cta-btn[data-song]").forEach(function (btn) {
           btn.addEventListener("click", function () {
             if (window.aespaSelectMv) window.aespaSelectMv(btn.dataset.song, false);
           });
@@ -508,4 +508,98 @@ document.querySelectorAll(".member-gallery").forEach(function (gallery) {
   if (!window.aespaUpdateLyricLink) return;
   var tab = document.querySelector("#mvTabs .mv-tab.active");
   if (tab) window.aespaUpdateLyricLink(tab.dataset.song);
+})();
+
+(function () {
+  var feed = document.getElementById("updatesFeed");
+  var filters = document.querySelectorAll("#updateFilters .updates-filter");
+  var countEl = document.getElementById("updateCount");
+  var expandBtn = document.getElementById("updatesExpand");
+  var cards = feed ? feed.querySelectorAll(".update-card") : [];
+  var moreCards = feed ? feed.querySelectorAll(".update-card.update-more") : [];
+
+  if (!feed || !cards.length) return;
+
+  function visibleCards() {
+    var expanded = feed.classList.contains("is-expanded");
+    return Array.from(cards).filter(function (card) {
+      if (card.classList.contains("is-hidden")) return false;
+      if (card.classList.contains("update-more") && !expanded) return false;
+      return true;
+    });
+  }
+
+  function refreshCount() {
+    if (!countEl) return;
+    var n = visibleCards().length;
+    countEl.textContent = n + " 条动态";
+  }
+
+  filters.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var cat = btn.dataset.filter;
+      filters.forEach(function (b) {
+        var on = b === btn;
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      cards.forEach(function (card) {
+        var show = cat === "all" || card.dataset.cat === cat;
+        card.classList.toggle("is-hidden", !show);
+      });
+      refreshCount();
+    });
+  });
+
+  if (expandBtn && moreCards.length) {
+    expandBtn.addEventListener("click", function () {
+      var open = feed.classList.toggle("is-expanded");
+      expandBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      expandBtn.querySelector(".expand-label").textContent = open ? "收起较早动向" : "展开更多动向";
+      refreshCount();
+    });
+  } else if (expandBtn) {
+    expandBtn.classList.add("is-hidden");
+  }
+
+  refreshCount();
+})();
+
+(function () {
+  var NEXT_EVENT = new Date("2026-08-02T11:00:00-05:00");
+  var spotlight = document.getElementById("updatesCountdown");
+  var sub = document.getElementById("updatesCountdownSub");
+  var cdDays = document.getElementById("cdDays");
+  var cdHours = document.getElementById("cdHours");
+  var cdMins = document.getElementById("cdMins");
+
+  if (!spotlight && !cdDays) return;
+
+  function pad(n) {
+    return n < 10 ? "0" + n : String(n);
+  }
+
+  function tick() {
+    var now = new Date();
+    var diff = NEXT_EVENT - now;
+    if (diff <= 0) {
+      if (spotlight) spotlight.textContent = "进行中";
+      if (sub) sub.textContent = "Lollapalooza 芝加哥";
+      if (cdDays) cdDays.textContent = "0";
+      if (cdHours) cdHours.textContent = "00";
+      if (cdMins) cdMins.textContent = "00";
+      return;
+    }
+    var days = Math.floor(diff / 86400000);
+    var hours = Math.floor((diff % 86400000) / 3600000);
+    var mins = Math.floor((diff % 3600000) / 60000);
+    if (spotlight) spotlight.textContent = days + " 天";
+    if (sub) sub.textContent = days + " 天 " + hours + " 时 · 芝加哥";
+    if (cdDays) cdDays.textContent = String(days);
+    if (cdHours) cdHours.textContent = pad(hours);
+    if (cdMins) cdMins.textContent = pad(mins);
+  }
+
+  tick();
+  setInterval(tick, 30000);
 })();

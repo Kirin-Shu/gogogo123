@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="aespa（에스파）女团资料站：四位成员简介、官方 MV、中文歌词精选、KWANGYA 世界观与 2026 最新回归 LEMONADE。"
+      content="aespa（에스파）女团资料站：四位成员简介、官方 MV、中文歌词精选、KWANGYA 世界观、2026 最新回归 LEMONADE 与动向资讯。"
     />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="aespa · 에스파 女团资料" />
@@ -62,6 +62,7 @@
       <div class="nav-inner">
         <a href="#about" data-nav="about">简介</a>
         <a href="#latest" data-nav="latest">最新</a>
+        <a href="#updates" data-nav="updates">动向</a>
         <a href="#concept" data-nav="concept">世界观</a>
         <a href="#members" data-nav="members">成员</a>
         <a href="#mv" data-nav="mv">MV</a>
@@ -88,6 +89,11 @@
           <span class="tag">2020 出道</span>
           <span class="tag">全球活动</span>
           <span class="tag">2026 LEMONADE</span>
+        </div>
+        <div class="hero-cta">
+          <a class="hero-cta-btn primary" href="#latest">🍋 最新专辑</a>
+          <a class="hero-cta-btn" href="#updates">📡 最新动向</a>
+          <button type="button" class="hero-cta-btn" data-song="lemonade">▶ 播放 MV</button>
         </div>
       </header>
 
@@ -167,13 +173,14 @@
         <div class="comeback-stats">
           <div class="comeback-stat"><b>24h</b><span>MV 破千万播放</span></div>
           <div class="comeback-stat"><b>#1</b><span>多国 iTunes 专辑榜</span></div>
-          <div class="comeback-stat"><b>7</b><span>首全曲收录</span></div>
+          <div class="comeback-stat"><b>10</b><span>首全曲收录</span></div>
         </div>
         <div class="comeback-actions">
           <button type="button" class="comeback-btn" data-song="lemonade">▶ 播放 LEMONADE MV</button>
           <button type="button" class="comeback-btn secondary" data-song="wda">▶ 播放 WDA MV</button>
           <a class="comeback-btn secondary" href="#lyric-lemonade">📖 歌词解读</a>
           <a class="comeback-btn secondary" href="https://aespa.lnk.to/LEMONADE" target="_blank" rel="noopener">🎧 试听专辑</a>
+          <a class="comeback-btn secondary" href="#updates">📡 全部动向</a>
         </div>
         <div class="info-grid">
           <div class="info-item">
@@ -192,6 +199,228 @@
             <div class="label">官方频道</div>
             <div class="val"><a href="https://www.youtube.com/c/aespa" target="_blank" rel="noopener" style="color: #c4b5fd">YouTube @aespa</a></div>
           </div>
+        </div>
+      </section>
+
+      <section id="updates">
+        <div class="section-head">
+          <h2>最新动向</h2>
+          <span>NEWS · 2026</span>
+        </div>
+
+        <div class="updates-spotlight">
+          <div class="updates-spotlight-item">
+            <span class="spotlight-label">下一场</span>
+            <strong>Lollapalooza</strong>
+            <span class="spotlight-sub">芝加哥 · 08.02</span>
+          </div>
+          <div class="updates-spotlight-item accent">
+            <span class="spotlight-label">倒计时</span>
+            <strong id="updatesCountdown">—</strong>
+            <span class="spotlight-sub" id="updatesCountdownSub">距音乐节开幕</span>
+          </div>
+          <div class="updates-spotlight-item">
+            <span class="spotlight-label">世界巡演</span>
+            <strong>25 城</strong>
+            <span class="spotlight-sub">SYNK : COMPLæXITY</span>
+          </div>
+          <div class="updates-spotlight-item">
+            <span class="spotlight-label">最新专辑</span>
+            <strong>LEMONADE</strong>
+            <span class="spotlight-sub">正规二辑 · 已发行</span>
+          </div>
+        </div>
+
+        <div class="updates-toolbar">
+          <div class="updates-filters" id="updateFilters" role="tablist" aria-label="动向分类">
+            <button type="button" class="updates-filter active" data-filter="all" role="tab" aria-selected="true">全部</button>
+            <button type="button" class="updates-filter" data-filter="music" role="tab" aria-selected="false">回归</button>
+            <button type="button" class="updates-filter" data-filter="tour" role="tab" aria-selected="false">巡演</button>
+            <button type="button" class="updates-filter" data-filter="festival" role="tab" aria-selected="false">音乐节</button>
+            <button type="button" class="updates-filter" data-filter="award" role="tab" aria-selected="false">荣誉</button>
+          </div>
+          <span class="updates-count" id="updateCount">7 条动态</span>
+        </div>
+
+        <div class="updates-layout">
+          <div class="updates-main">
+            <div class="updates-feed" id="updatesFeed">
+            <article class="update-card highlight" data-cat="music">
+              <div class="update-rail" aria-hidden="true"></div>
+              <div class="update-body">
+                <div class="update-meta">
+                  <time datetime="2026-05-29">2026.05.29</time>
+                  <span class="update-tag music">回归</span>
+                  <span class="update-badge-new">最新</span>
+                </div>
+                <h3>正规二辑《LEMONADE》正式发行</h3>
+                <p>
+                  距《Armageddon》约两年后推出第二张正规专辑，共 10 首曲目。主打曲《Lemonade》MV 同步公开，以 EDM 与合成器 Bass 呈现「把柠檬做成柠檬水」的积极态度；专辑在多国 iTunes 专辑榜登顶，主打 MV 24 小时内播放量突破千万。
+                </p>
+                <div class="update-links">
+                  <button type="button" class="update-link" data-song="lemonade">▶ Lemonade MV</button>
+                  <a class="update-link" href="#lyric-lemonade">歌词解读</a>
+                  <a class="update-link" href="https://aespa.lnk.to/LEMONADE" target="_blank" rel="noopener">试听专辑</a>
+                </div>
+              </div>
+            </article>
+            <article class="update-card" data-cat="music">
+              <div class="update-rail" aria-hidden="true"></div>
+              <div class="update-body">
+                <div class="update-meta">
+                  <time datetime="2026-05-11">2026.05.11</time>
+                  <span class="update-tag music">先行曲</span>
+                </div>
+                <h3>《WDA (Whole Different Animal)》feat. G-DRAGON</h3>
+                <p>
+                  回归先行曲与 G-DRAGON 跨世代合作，5 月 11 日先行公开 MV。SM 以「P.O.S: Singularity」概念预告 KWANGYA 世界观新季，为正规二辑预热。
+                </p>
+                <div class="update-links">
+                  <button type="button" class="update-link" data-song="wda">▶ WDA MV</button>
+                </div>
+              </div>
+            </article>
+            <article class="update-card" data-cat="tour">
+              <div class="update-rail" aria-hidden="true"></div>
+              <div class="update-body">
+                <div class="update-meta">
+                  <time datetime="2026-04-27">2026.04.27</time>
+                  <span class="update-tag tour">巡演</span>
+                </div>
+                <h3>SYNK : COMPLæXITY 世界巡演官宣</h3>
+                <p>
+                  第四轮 SYNK 世界巡演正式公布，8 月 7 日首尔 Gocheok Sky Dome 开幕，途经台北、圣保罗、墨西哥城及北美 9 城，2027 年 1 月欧洲 9 站后以巴黎（2/2）收官，共 25 城。巡演将呈现全新舞台设计与视觉叙事。
+                </p>
+                <div class="update-links">
+                  <a class="update-link" href="https://www.aespaworldtour.com/" target="_blank" rel="noopener">巡演官网</a>
+                </div>
+              </div>
+            </article>
+            <article class="update-card update-more" data-cat="tour">
+              <div class="update-rail" aria-hidden="true"></div>
+              <div class="update-body">
+                <div class="update-meta">
+                  <time datetime="2026-04-26">2026.04.26</time>
+                  <span class="update-tag tour">巡演</span>
+                </div>
+                <h3>SYNK : aeXIS LINE 东京巨蛋圆满收官</h3>
+                <p>
+                  第三轮 SYNK 巡演亚洲 leg 在东京巨蛋连演两日后结束。本轮巡演自 2025 年 8 月启动，历经首尔、香港、澳门、印尼、大阪等地，累计约 33.6 万人次观演，为《Rich Man》时期划上句号。
+                </p>
+              </div>
+            </article>
+            <article class="update-card update-more" data-cat="festival">
+              <div class="update-rail" aria-hidden="true"></div>
+              <div class="update-body">
+                <div class="update-meta">
+                  <time datetime="2026-04-27">2026.04.27</time>
+                  <span class="update-tag festival">音乐节</span>
+                </div>
+                <h3>确认出演 Lollapalooza 2026 芝加哥</h3>
+                <p>
+                  8 月 2 日（巡演首尔站前）登陆芝加哥 Grant Park Lollapalooza 音乐节，为北美粉丝提前预览 COMPLæXITY 舞台。继 2022 Coachella、2023 Outside Lands 后再次亮相美国顶级音乐节。
+                </p>
+              </div>
+            </article>
+            <article class="update-card update-more" data-cat="award">
+              <div class="update-rail" aria-hidden="true"></div>
+              <div class="update-body">
+                <div class="update-meta">
+                  <time datetime="2026">2026</time>
+                  <span class="update-tag award">荣誉</span>
+                </div>
+                <h3>AMA 2026 · Red Dot · Billboard 三连击</h3>
+                <p>
+                  获 American Music Awards 2026「Best Female K-Pop Artist」提名；单曲《Dirty Work》「Dirty Case Ver.」获 Red Dot Design Award 2026 产品设计类奖项；并斩获 Billboard Women in Music 2025「Group of the Year」，全球影响力持续扩大。
+                </p>
+              </div>
+            </article>
+            <article class="update-card update-more" data-cat="music">
+              <div class="update-rail" aria-hidden="true"></div>
+              <div class="update-body">
+                <div class="update-meta">
+                  <time datetime="2026-04-20">2026.04.20</time>
+                  <span class="update-tag music">预告</span>
+                </div>
+                <h3>《LEMONADE》回归日程公开</h3>
+                <p>
+                  SM 正式公布 5 月 29 日发行正规二辑，随后释出「ComplæXity」预告片、Highlight Medley 及「Make It Lemonade」概念片，完整回归宣传周期自 4 月下旬起全面铺开。
+                </p>
+              </div>
+            </article>
+            </div>
+
+            <button type="button" class="updates-expand" id="updatesExpand" aria-expanded="false">
+              <span class="expand-label">展开更多动向</span>
+              <span class="expand-icon" aria-hidden="true">↓</span>
+            </button>
+          </div>
+
+          <aside class="updates-aside">
+            <div class="updates-aside-head">
+              <h3 class="updates-aside-title">即将发生</h3>
+              <span class="updates-live-pill">LIVE SOON</span>
+            </div>
+            <div class="updates-countdown-box">
+              <span class="countdown-label">距 Lollapalooza</span>
+              <div class="countdown-digits" id="asideCountdown">
+                <span><b id="cdDays">—</b><small>天</small></span>
+                <span class="cd-sep">:</span>
+                <span><b id="cdHours">—</b><small>时</small></span>
+                <span class="cd-sep">:</span>
+                <span><b id="cdMins">—</b><small>分</small></span>
+              </div>
+            </div>
+            <ol class="upcoming-list">
+              <li class="upcoming-next">
+                <span class="upcoming-dot" aria-hidden="true"></span>
+                <time datetime="2026-08-02">08.02</time>
+                <div>
+                  <strong>Lollapalooza</strong>
+                  <span>芝加哥 · Grant Park</span>
+                </div>
+              </li>
+              <li>
+                <time datetime="2026-08-07">08.07–08</time>
+                <div>
+                  <strong>SYNK : COMPLæXITY</strong>
+                  <span>首尔 · Gocheok Sky Dome</span>
+                </div>
+              </li>
+              <li>
+                <time datetime="2026-08-11">08.11</time>
+                <div>
+                  <strong>巡演 · 台北</strong>
+                  <span>亚洲 leg</span>
+                </div>
+              </li>
+              <li>
+                <time datetime="2026-09">09 月</time>
+                <div>
+                  <strong>拉美 + 北美 leg</strong>
+                  <span>圣保罗 → 温哥华</span>
+                </div>
+              </li>
+              <li>
+                <time datetime="2027-01">2027.01</time>
+                <div>
+                  <strong>欧洲 leg 开幕</strong>
+                  <span>曼彻斯特 → 巴黎</span>
+                </div>
+              </li>
+              <li class="upcoming-finale">
+                <time datetime="2027-02-02">02.02</time>
+                <div>
+                  <strong>巡演收官</strong>
+                  <span>巴黎</span>
+                </div>
+              </li>
+            </ol>
+            <div class="updates-aside-links">
+              <a class="updates-aside-btn" href="https://www.aespaworldtour.com/" target="_blank" rel="noopener">巡演官网 →</a>
+              <a class="updates-aside-btn secondary" href="#latest">LEMONADE 详情</a>
+            </div>
+          </aside>
         </div>
       </section>
 
@@ -661,6 +890,11 @@
             <p class="tl-desc">距《Whiplash》约一年后再度回归，延续组合全球活动。</p>
           </div>
           <div class="tl-item">
+            <div class="tl-date">2026.04</div>
+            <div class="tl-title">aeXIS LINE 收官 · 巡演官宣</div>
+            <p class="tl-desc">东京巨蛋连演结束第三轮 SYNK；公布 COMPLæXITY 世界巡演与 Lollapalooza 芝加哥出演。</p>
+          </div>
+          <div class="tl-item">
             <div class="tl-date">2026.05</div>
             <div class="tl-title">正规二辑《LEMONADE》</div>
             <p class="tl-desc">先行曲 WDA（G-DRAGON 合作）+ 主打 Lemonade，MV 24h 破千万播放。</p>
@@ -746,7 +980,7 @@
             <div class="disc-type">2026 正规</div>
             <div>
               <div class="disc-name">LEMONADE</div>
-              <div class="disc-note">第二张正规 · Lemonade · WDA · 全 7 曲</div>
+              <div class="disc-note">第二张正规 · 全 10 曲 · Lemonade · WDA</div>
             </div>
           </div>
           <div class="disc-row" data-cat="jp">
@@ -770,6 +1004,14 @@
             <div class="awards">
               <span class="award">LEMONADE MV 24h 破千万播放</span>
               <span class="award">多国 iTunes 专辑榜 #1</span>
+              <span class="award">AMA 2026 Best Female K-Pop Artist 提名</span>
+              <span class="award">Red Dot Design Award 2026（Dirty Work）</span>
+            </div>
+          </div>
+          <div class="award-year-group">
+            <h4>2025</h4>
+            <div class="awards">
+              <span class="award">Billboard Women in Music · Group of the Year</span>
             </div>
           </div>
           <div class="award-year-group">
