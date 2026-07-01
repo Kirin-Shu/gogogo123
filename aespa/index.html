@@ -62,7 +62,7 @@
       <div class="nav-inner">
         <a href="#about" data-nav="about">简介</a>
         <a href="#latest" data-nav="latest">最新</a>
-        <a href="#updates" data-nav="updates">动向</a>
+        <a href="#updates" data-nav="updates" class="nav-hot">动向<span class="nav-dot" aria-hidden="true"></span></a>
         <a href="#concept" data-nav="concept">世界观</a>
         <a href="#members" data-nav="members">成员</a>
         <a href="#mv" data-nav="mv">MV</a>
@@ -95,6 +95,7 @@
           <a class="hero-cta-btn" href="#updates">📡 最新动向</a>
           <button type="button" class="hero-cta-btn" data-song="lemonade">▶ 播放 MV</button>
         </div>
+        <a class="hero-scroll-hint" href="#about" aria-label="向下浏览">↓</a>
       </header>
 
       <section id="about">
@@ -160,8 +161,8 @@
               后续巡演 <strong>SYNK: COMPLæXITY</strong>（2026.08 起）将横跨亚洲、美洲与欧洲。
             </p>
             <div class="track-pills">
-              <span class="track-pill">Lemonade</span>
-              <span class="track-pill feat">WDA (Feat. G-DRAGON)</span>
+              <button type="button" class="track-pill track-pill-btn" data-song="lemonade">Lemonade</button>
+              <button type="button" class="track-pill track-pill-btn feat" data-song="wda">WDA (Feat. G-DRAGON)</button>
               <span class="track-pill">Shakin'</span>
               <span class="track-pill">Can't Help Myself</span>
               <span class="track-pill">Camouflage</span>
@@ -169,6 +170,13 @@
               <span class="track-pill feat">Lemonade (Feat. Becky G)</span>
             </div>
           </div>
+        </div>
+        <div class="comeback-chronology" aria-label="LEMONADE 回归时间线">
+          <div class="chrono-item done"><span>04.20</span>日程公开</div>
+          <div class="chrono-item done"><span>05.11</span>WDA 先行</div>
+          <div class="chrono-item done"><span>05.29</span>专辑发行</div>
+          <div class="chrono-item next"><span>08.02</span>Lollapalooza</div>
+          <div class="chrono-item next"><span>08.07</span>巡演开幕</div>
         </div>
         <div class="comeback-stats">
           <div class="comeback-stat"><b>24h</b><span>MV 破千万播放</span></div>
@@ -208,27 +216,43 @@
           <span>NEWS · 2026</span>
         </div>
 
+        <div class="updates-ticker" aria-label="滚动资讯">
+          <span class="ticker-label">FLASH</span>
+          <div class="ticker-viewport">
+            <div class="ticker-track">
+              <span>LEMONADE 正式回归 · MV 24h 破千万</span>
+              <span>SYNK : COMPLæXITY 世界巡演 25 城官宣</span>
+              <span>8/2 Lollapalooza 芝加哥 · 8/7 首尔巡演开幕</span>
+              <span>AMA 2026 · Red Dot · Billboard 荣誉连击</span>
+              <span>LEMONADE 正式回归 · MV 24h 破千万</span>
+              <span>SYNK : COMPLæXITY 世界巡演 25 城官宣</span>
+              <span>8/2 Lollapalooza 芝加哥 · 8/7 首尔巡演开幕</span>
+              <span>AMA 2026 · Red Dot · Billboard 荣誉连击</span>
+            </div>
+          </div>
+        </div>
+
         <div class="updates-spotlight">
-          <div class="updates-spotlight-item">
+          <a class="updates-spotlight-item" href="#updates" data-scroll="festival">
             <span class="spotlight-label">下一场</span>
             <strong>Lollapalooza</strong>
             <span class="spotlight-sub">芝加哥 · 08.02</span>
-          </div>
-          <div class="updates-spotlight-item accent">
+          </a>
+          <a class="updates-spotlight-item accent" href="#updates">
             <span class="spotlight-label">倒计时</span>
             <strong id="updatesCountdown">—</strong>
             <span class="spotlight-sub" id="updatesCountdownSub">距音乐节开幕</span>
-          </div>
-          <div class="updates-spotlight-item">
+          </a>
+          <a class="updates-spotlight-item" href="https://www.aespaworldtour.com/" target="_blank" rel="noopener">
             <span class="spotlight-label">世界巡演</span>
             <strong>25 城</strong>
             <span class="spotlight-sub">SYNK : COMPLæXITY</span>
-          </div>
-          <div class="updates-spotlight-item">
+          </a>
+          <a class="updates-spotlight-item" href="#latest">
             <span class="spotlight-label">最新专辑</span>
             <strong>LEMONADE</strong>
             <span class="spotlight-sub">正规二辑 · 已发行</span>
-          </div>
+          </a>
         </div>
 
         <div class="updates-toolbar">
@@ -242,6 +266,11 @@
           <span class="updates-count" id="updateCount">7 条动态</span>
         </div>
 
+        <div class="updates-empty" id="updatesEmpty" hidden>
+          <p>该分类暂无匹配动向</p>
+          <button type="button" class="updates-empty-btn" id="updatesResetFilter">查看全部</button>
+        </div>
+
         <div class="updates-layout">
           <div class="updates-main">
             <div class="updates-feed" id="updatesFeed">
@@ -250,6 +279,7 @@
               <div class="update-body">
                 <div class="update-meta">
                   <time datetime="2026-05-29">2026.05.29</time>
+                  <span class="update-relative" data-date="2026-05-29"></span>
                   <span class="update-tag music">回归</span>
                   <span class="update-badge-new">最新</span>
                 </div>
@@ -269,6 +299,7 @@
               <div class="update-body">
                 <div class="update-meta">
                   <time datetime="2026-05-11">2026.05.11</time>
+                  <span class="update-relative" data-date="2026-05-11"></span>
                   <span class="update-tag music">先行曲</span>
                 </div>
                 <h3>《WDA (Whole Different Animal)》feat. G-DRAGON</h3>
@@ -285,6 +316,7 @@
               <div class="update-body">
                 <div class="update-meta">
                   <time datetime="2026-04-27">2026.04.27</time>
+                  <span class="update-relative" data-date="2026-04-27"></span>
                   <span class="update-tag tour">巡演</span>
                 </div>
                 <h3>SYNK : COMPLæXITY 世界巡演官宣</h3>
@@ -301,6 +333,7 @@
               <div class="update-body">
                 <div class="update-meta">
                   <time datetime="2026-04-26">2026.04.26</time>
+                  <span class="update-relative" data-date="2026-04-26"></span>
                   <span class="update-tag tour">巡演</span>
                 </div>
                 <h3>SYNK : aeXIS LINE 东京巨蛋圆满收官</h3>
@@ -309,11 +342,12 @@
                 </p>
               </div>
             </article>
-            <article class="update-card update-more" data-cat="festival">
+            <article class="update-card update-more" data-cat="festival" id="update-festival">
               <div class="update-rail" aria-hidden="true"></div>
               <div class="update-body">
                 <div class="update-meta">
                   <time datetime="2026-04-27">2026.04.27</time>
+                  <span class="update-relative" data-date="2026-04-27"></span>
                   <span class="update-tag festival">音乐节</span>
                 </div>
                 <h3>确认出演 Lollapalooza 2026 芝加哥</h3>
@@ -340,6 +374,7 @@
               <div class="update-body">
                 <div class="update-meta">
                   <time datetime="2026-04-20">2026.04.20</time>
+                  <span class="update-relative" data-date="2026-04-20"></span>
                   <span class="update-tag music">预告</span>
                 </div>
                 <h3>《LEMONADE》回归日程公开</h3>
@@ -416,6 +451,35 @@
                 </div>
               </li>
             </ol>
+            <details class="tour-details">
+              <summary>查看完整巡演路线（25 城）</summary>
+              <ul class="tour-cities">
+                <li><time>08.07–08</time> 首尔 · Gocheok Sky Dome</li>
+                <li><time>08.11</time> 台北</li>
+                <li><time>09.04</time> 圣保罗</li>
+                <li><time>09.06</time> 圣地亚哥</li>
+                <li><time>09.11</time> 墨西哥城</li>
+                <li><time>09.15</time> 哈密尔顿</li>
+                <li><time>09.18</time> 纽约 Elmont</li>
+                <li><time>09.22</time> 华盛顿</li>
+                <li><time>09.24</time> 亚特兰大</li>
+                <li><time>09.26</time> 迈阿密</li>
+                <li><time>09.29</time> 达拉斯</li>
+                <li><time>10.03</time> 洛杉矶</li>
+                <li><time>10.06</time> 奥克兰</li>
+                <li><time>10.09</time> 西雅图</li>
+                <li><time>10.11</time> 温哥华</li>
+                <li><time>2027.01.14</time> 曼彻斯特</li>
+                <li><time>01.16</time> 伦敦</li>
+                <li><time>01.19</time> 阿姆斯特丹</li>
+                <li><time>01.22</time> 斯德哥尔摩</li>
+                <li><time>01.24</time> 哥本哈根</li>
+                <li><time>01.26</time> 柏林</li>
+                <li><time>01.29</time> 米兰</li>
+                <li><time>01.31</time> 巴塞罗那</li>
+                <li><time>02.02</time> 巴黎（收官）</li>
+              </ul>
+            </details>
             <div class="updates-aside-links">
               <a class="updates-aside-btn" href="https://www.aespaworldtour.com/" target="_blank" rel="noopener">巡演官网 →</a>
               <a class="updates-aside-btn secondary" href="#latest">LEMONADE 详情</a>

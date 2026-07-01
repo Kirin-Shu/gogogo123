@@ -351,6 +351,20 @@
         border-color: rgba(168, 85, 247, 0.45);
         background: rgba(168, 85, 247, 0.16);
       }
+      .nav-hot {
+        position: relative;
+      }
+      .nav-dot {
+        position: absolute;
+        top: 4px;
+        right: 6px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #fde047;
+        box-shadow: 0 0 8px rgba(250, 204, 21, 0.7);
+        animation: livePulse 2.5s ease-in-out infinite;
+      }
 
       main {
         position: relative;
@@ -457,6 +471,34 @@
       .hero-cta-btn.primary:hover {
         border-color: rgba(250, 204, 21, 0.55);
         background: rgba(250, 204, 21, 0.18);
+      }
+      .hero-scroll-hint {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        margin-top: 32px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 1rem;
+        animation: scrollBounce 2.2s ease-in-out infinite;
+        transition: border-color 0.2s, color 0.2s;
+      }
+      .hero-scroll-hint:hover {
+        color: #c4b5fd;
+        border-color: rgba(168, 85, 247, 0.45);
+      }
+      @keyframes scrollBounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(6px);
+        }
       }
       .tag {
         font-size: 0.75rem;
@@ -1064,6 +1106,116 @@
         border-color: rgba(168, 85, 247, 0.4);
         color: #e9d5ff;
       }
+      .track-pill-btn {
+        font-family: inherit;
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      }
+      .track-pill-btn:hover {
+        border-color: rgba(250, 204, 21, 0.45);
+        background: rgba(250, 204, 21, 0.1);
+        transform: translateY(-1px);
+      }
+      .comeback-chronology {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 4px 2px 12px;
+        margin-bottom: 16px;
+        scrollbar-width: none;
+      }
+      .comeback-chronology::-webkit-scrollbar {
+        display: none;
+      }
+      .chrono-item {
+        flex: 1 0 100px;
+        min-width: 100px;
+        text-align: center;
+        padding: 10px 8px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.03);
+        font-size: 0.72rem;
+        color: var(--muted);
+        position: relative;
+      }
+      .chrono-item span {
+        display: block;
+        font-family: Syne, sans-serif;
+        font-size: 0.85rem;
+        color: #d4d4e8;
+        margin-bottom: 4px;
+        font-variant-numeric: tabular-nums;
+      }
+      .chrono-item.done {
+        border-color: rgba(168, 85, 247, 0.3);
+      }
+      .chrono-item.done span {
+        color: #c4b5fd;
+      }
+      .chrono-item.next {
+        border-color: rgba(250, 204, 21, 0.35);
+        background: rgba(250, 204, 21, 0.06);
+      }
+      .chrono-item.next span {
+        color: #fde047;
+      }
+      .chrono-item + .chrono-item::before {
+        content: "";
+        position: absolute;
+        left: -9px;
+        top: 50%;
+        width: 8px;
+        height: 2px;
+        background: rgba(168, 85, 247, 0.35);
+        transform: translateY(-50%);
+      }
+
+      .updates-ticker {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(250, 204, 21, 0.25);
+        background: linear-gradient(90deg, rgba(250, 204, 21, 0.08), rgba(168, 85, 247, 0.05));
+        overflow: hidden;
+      }
+      .ticker-label {
+        flex-shrink: 0;
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        color: #fde047;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: rgba(250, 204, 21, 0.15);
+      }
+      .ticker-viewport {
+        overflow: hidden;
+        flex: 1;
+        mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+      }
+      .ticker-track {
+        display: flex;
+        gap: 48px;
+        width: max-content;
+        animation: tickerScroll 28s linear infinite;
+      }
+      .ticker-track span {
+        font-size: 0.78rem;
+        color: #d4d4e8;
+        white-space: nowrap;
+      }
+      @keyframes tickerScroll {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
 
       .updates-layout {
         display: grid;
@@ -1096,6 +1248,15 @@
         background: var(--card);
         border: 1px solid var(--border);
         text-align: center;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      }
+      .updates-spotlight-item:hover {
+        border-color: rgba(168, 85, 247, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
       }
       .updates-spotlight-item.accent {
         border-color: rgba(250, 204, 21, 0.35);
@@ -1164,6 +1325,29 @@
         color: var(--muted);
         font-variant-numeric: tabular-nums;
       }
+      .updates-empty {
+        text-align: center;
+        padding: 28px 16px;
+        margin-bottom: 16px;
+        border-radius: 12px;
+        border: 1px dashed rgba(168, 85, 247, 0.35);
+        background: rgba(168, 85, 247, 0.05);
+      }
+      .updates-empty p {
+        margin: 0 0 12px;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      .updates-empty-btn {
+        font-family: inherit;
+        font-size: 0.78rem;
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        background: rgba(168, 85, 247, 0.12);
+        color: #ddd6fe;
+        cursor: pointer;
+      }
       .updates-main {
         min-width: 0;
       }
@@ -1190,9 +1374,13 @@
         grid-template-columns: auto 1fr;
         gap: 0;
         margin-bottom: 12px;
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 0.45s ease, transform 0.45s ease, max-height 0.35s;
+      }
+      .update-card.is-visible {
         opacity: 1;
         transform: translateY(0);
-        transition: opacity 0.3s, transform 0.3s, max-height 0.35s;
       }
       .update-card.is-hidden {
         display: none;
@@ -1253,6 +1441,10 @@
         background: linear-gradient(135deg, rgba(250, 204, 21, 0.06), rgba(168, 85, 247, 0.04));
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
       }
+      .update-card.flash-focus .update-body {
+        border-color: rgba(236, 72, 153, 0.55);
+        box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.25), 0 8px 32px rgba(0, 0, 0, 0.2);
+      }
       .update-meta {
         display: flex;
         align-items: center;
@@ -1274,6 +1466,14 @@
         color: var(--muted);
         letter-spacing: 0.04em;
         font-variant-numeric: tabular-nums;
+      }
+      .update-relative {
+        font-size: 0.68rem;
+        color: rgba(196, 181, 253, 0.75);
+      }
+      .update-relative::before {
+        content: "· ";
+        color: var(--muted);
       }
       .update-tag {
         font-size: 0.62rem;
@@ -1544,10 +1744,67 @@
       .updates-aside-btn.secondary:hover {
         background: rgba(250, 204, 21, 0.14);
       }
+      .tour-details {
+        margin-bottom: 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+      }
+      .tour-details summary {
+        padding: 10px 12px;
+        font-size: 0.72rem;
+        color: #93c5fd;
+        cursor: pointer;
+        list-style: none;
+        user-select: none;
+      }
+      .tour-details summary::-webkit-details-marker {
+        display: none;
+      }
+      .tour-details summary::after {
+        content: " ▾";
+        opacity: 0.7;
+      }
+      .tour-details[open] summary::after {
+        content: " ▴";
+      }
+      .tour-cities {
+        list-style: none;
+        margin: 0;
+        padding: 0 12px 10px;
+        max-height: 180px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+      }
+      .tour-cities li {
+        display: flex;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        font-size: 0.7rem;
+        color: #a8a8c0;
+      }
+      .tour-cities li:last-child {
+        border-bottom: none;
+      }
+      .tour-cities time {
+        flex-shrink: 0;
+        min-width: 52px;
+        color: #fde047;
+        font-variant-numeric: tabular-nums;
+      }
       @media (prefers-reduced-motion: reduce) {
         .updates-live-pill,
-        .upcoming-dot {
+        .upcoming-dot,
+        .nav-dot,
+        .hero-scroll-hint,
+        .ticker-track {
           animation: none;
+        }
+        .update-card {
+          opacity: 1;
+          transform: none;
         }
       }
 

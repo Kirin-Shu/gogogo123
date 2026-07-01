@@ -154,7 +154,7 @@
       })();
 
 (function () {
-        document.querySelectorAll(".comeback-btn[data-song], .update-link[data-song], .hero-cta-btn[data-song]").forEach(function (btn) {
+        document.querySelectorAll(".comeback-btn[data-song], .update-link[data-song], .hero-cta-btn[data-song], .track-pill-btn[data-song]").forEach(function (btn) {
           btn.addEventListener("click", function () {
             if (window.aespaSelectMv) window.aespaSelectMv(btn.dataset.song, false);
           });
@@ -515,8 +515,12 @@ document.querySelectorAll(".member-gallery").forEach(function (gallery) {
   var filters = document.querySelectorAll("#updateFilters .updates-filter");
   var countEl = document.getElementById("updateCount");
   var expandBtn = document.getElementById("updatesExpand");
+  var emptyEl = document.getElementById("updatesEmpty");
+  var resetBtn = document.getElementById("updatesResetFilter");
+  var layoutEl = document.querySelector(".updates-layout");
   var cards = feed ? feed.querySelectorAll(".update-card") : [];
   var moreCards = feed ? feed.querySelectorAll(".update-card.update-more") : [];
+  var filterLabels = { all: "全部", music: "回归", tour: "巡演", festival: "音乐节", award: "荣誉" };
 
   if (!feed || !cards.length) return;
 
@@ -529,27 +533,76 @@ document.querySelectorAll(".member-gallery").forEach(function (gallery) {
     });
   }
 
+  function countForCat(cat) {
+    if (cat === "all") return cards.length;
+    var n = 0;
+    cards.forEach(function (card) {
+      if (card.dataset.cat === cat) n++;
+    });
+    return n;
+  }
+
+  function setFilterLabels() {
+    filters.forEach(function (btn) {
+      var cat = btn.dataset.filter;
+      var label = filterLabels[cat] || cat;
+      var n = countForCat(cat);
+      btn.textContent = label + " (" + n + ")";
+    });
+  }
+
   function refreshCount() {
     if (!countEl) return;
     var n = visibleCards().length;
     countEl.textContent = n + " 条动态";
+    if (emptyEl && layoutEl) {
+      var showEmpty = n === 0;
+      emptyEl.hidden = !showEmpty;
+      layoutEl.hidden = showEmpty;
+    }
+  }
+
+  function ensureExpandedForVisible() {
+    var needExpand = false;
+    cards.forEach(function (card) {
+      if (!card.classList.contains("is-hidden") && card.classList.contains("update-more")) {
+        needExpand = true;
+      }
+    });
+    if (needExpand && !feed.classList.contains("is-expanded")) {
+      feed.classList.add("is-expanded");
+      if (expandBtn) {
+        expandBtn.setAttribute("aria-expanded", "true");
+        expandBtn.querySelector(".expand-label").textContent = "收起较早动向";
+      }
+    }
+  }
+
+  function applyFilter(cat) {
+    filters.forEach(function (b) {
+      var on = b.dataset.filter === cat;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    cards.forEach(function (card) {
+      var show = cat === "all" || card.dataset.cat === cat;
+      card.classList.toggle("is-hidden", !show);
+    });
+    ensureExpandedForVisible();
+    refreshCount();
   }
 
   filters.forEach(function (btn) {
     btn.addEventListener("click", function () {
-      var cat = btn.dataset.filter;
-      filters.forEach(function (b) {
-        var on = b === btn;
-        b.classList.toggle("active", on);
-        b.setAttribute("aria-selected", on ? "true" : "false");
-      });
-      cards.forEach(function (card) {
-        var show = cat === "all" || card.dataset.cat === cat;
-        card.classList.toggle("is-hidden", !show);
-      });
-      refreshCount();
+      applyFilter(btn.dataset.filter);
     });
   });
+
+  if (resetBtn) {
+    resetBtn.addEventListener("click", function () {
+      applyFilter("all");
+    });
+  }
 
   if (expandBtn && moreCards.length) {
     expandBtn.addEventListener("click", function () {
@@ -562,6 +615,74 @@ document.querySelectorAll(".member-gallery").forEach(function (gallery) {
     expandBtn.classList.add("is-hidden");
   }
 
+  document.querySelectorAll('.updates-spotlight-item[data-scroll="festival"]').forEach(function (el) {
+    el.addEventListener("click", function (e) {
+      var target = document.getElementById("update-festival");
+      if (!target) return;
+      e.preventDefault();
+      applyFilter("festival");
+      if (!feed.classList.contains("is-expanded")) {
+        feed.classList.add("is-expanded");
+        if (expandBtn) {
+          expandBtn.setAttribute("aria-expanded", "true");
+          expandBtn.querySelector(".expand-label").textContent = "收起较早动向";
+        }
+      }
+      refreshCount();
+      setTimeout(function () {
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+        target.classList.add("flash-focus");
+        setTimeout(function () {
+          target.classList.remove("flash-focus");
+        }, 1200);
+      }, 80);
+    });
+  });
+
+  function relativeLabel(dateStr) {
+    if (!dateStr || dateStr.length < 8) return "";
+    var d = new Date(dateStr + "T12:00:00");
+    if (isNaN(d.getTime())) return "";
+    var now = new Date();
+    var diff = now - d;
+    var days = Math.floor(diff / 86400000);
+    if (days < 0) return "即将";
+    if (days === 0) return "今天";
+    if (days === 1) return "昨天";
+    if (days < 7) return days + " 天前";
+    if (days < 30) return Math.floor(days / 7) + " 周前";
+    if (days < 365) return Math.floor(days / 30) + " 个月前";
+    return Math.floor(days / 365) + " 年前";
+  }
+
+  document.querySelectorAll(".update-relative[data-date]").forEach(function (el) {
+    var text = relativeLabel(el.dataset.date);
+    if (text) el.textContent = text;
+  });
+
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) {
+    var revealObs = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            revealObs.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
+    );
+    cards.forEach(function (card, i) {
+      card.style.transitionDelay = Math.min(i * 0.06, 0.36) + "s";
+      revealObs.observe(card);
+    });
+  } else {
+    cards.forEach(function (card) {
+      card.classList.add("is-visible");
+    });
+  }
+
+  setFilterLabels();
   refreshCount();
 })();
 
